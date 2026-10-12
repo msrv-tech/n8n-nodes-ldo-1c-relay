@@ -44,6 +44,7 @@ Confirm delivery only after the destination accepts the file. If delivery fails,
 
 ## Compatibility and limitations
 
+- Smoke-tested in n8n 2.42.7, including discovery of the node and credential.
 - Node.js 22.22.0 or later. The tested `n8n-workflow` version is recorded in `package-lock.json`; host compatibility is declared in `peerDependencies`.
 - Requires LDO Relay command contract `1.0` and an extension that supports the selected operation. Available operations depend on the configuration and policy.
 - An operation may wait up to 1800 seconds. Your n8n execution timeout must permit the polling schedule. PDF preparation may wait separately for the result and the file.

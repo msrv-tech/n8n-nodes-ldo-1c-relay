@@ -298,6 +298,7 @@ export class Ldo1cRelay implements INodeType {
 		icon: { light: 'file:ldoRelay.svg', dark: 'file:ldoRelay.dark.svg' },
 		group: ['transform'],
 		version: 1,
+		usableAsTool: false,
 		description: 'Work with a 1C database through the LDO Relay API',
 		credentials: [{ name: 'ldoRelayApi', required: true }],
 		subtitle:
@@ -900,7 +901,6 @@ export class Ldo1cRelay implements INodeType {
 				displayOptions: { show: { resource: ['finalize'], finalizeAction: ['fail'] } },
 			},
 		],
-		usableAsTool: true,
 	};
 
 	async operation(this: IExecuteFunctions, index: number): Promise<INodeExecutionData> {
