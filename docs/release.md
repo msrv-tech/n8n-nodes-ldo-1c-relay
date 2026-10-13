@@ -4,7 +4,7 @@ The GitHub repository, npm package, and n8n verification are separate release st
 
 ## Configure publishing
 
-The `publish.yml` workflow supports npm Trusted Publishing through GitHub OIDC. Configure npm to trust owner `msrv-tech`, repository `n8n-nodes-ldo-1c-relay`, and workflow `publish.yml`.
+The `publish.yml` workflow supports npm Trusted Publishing through GitHub OIDC. Configure npm to trust owner `msrv-tech`, repository `n8n-nodes-ldo-1c-relay`, and workflow `publish.yml`. Allow direct `npm publish` and leave the environment name blank. The release uses Node.js 24 and npm 11.21.0.
 
 For the first publication, or if Trusted Publishing is unavailable, set repository Actions secret `NPM_TOKEN` to a granular npm token permitted to publish this package. Never commit a token or `.npmrc`. See [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/) and [n8n publication requirements](https://docs.n8n.io/integrations/community-nodes/building-community-nodes.md).
 
@@ -15,6 +15,10 @@ For the first publication, or if Trusted Publishing is unavailable, set reposito
 3. Commit and push to `main`.
 4. Push a tag matching the package version, such as `v0.1.0`. The workflow checks the version, runs all checks, and executes `npm publish --provenance --access public`.
 5. Confirm the workflow and npm publication succeeded. Update the README status only after confirmation.
+
+If authentication fails, correct the npm configuration and rerun the existing release job. Alternatively, run `gh workflow run publish.yml --ref v0.1.0` for that release. Manual runs from `main` are rejected; do not move a published version tag to another commit.
+
+After publication, run `npx @n8n/scan-community-package@stable n8n-nodes-ldo-1c-relay@0.1.0` and confirm that it reports success. This checks registry provenance as well as the attested source and published JavaScript. Local static analysis alone does not verify registry provenance.
 
 Do not use `npm run release` to publish from a local machine. The CLI script comes from the scaffold; the documented publication path is the tag-triggered workflow.
 

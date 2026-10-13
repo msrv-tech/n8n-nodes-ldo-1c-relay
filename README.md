@@ -4,7 +4,7 @@ Connect a 1C database to n8n through the **LDO Relay API**. The separately insta
 
 This package integrates LDO Relay. It requires an enrolled 1C database, the compatible LDO extension, and Relay access. It does not connect directly to a database or provide generic access to unrelated APIs.
 
-**Release status:** initial public source release. The npm package has not yet been published, and this node has not been verified by n8n. Installing through the n8n Cloud node panel requires verification.
+**Verification status:** this node has not been verified by n8n. Installing through the n8n Cloud node panel requires verification.
 
 [n8n](https://n8n.io/) is a workflow automation platform.
 
@@ -44,7 +44,7 @@ Confirm delivery only after the destination accepts the file. If delivery fails,
 
 ## Compatibility and limitations
 
-- Smoke-tested in n8n 2.42.7, including discovery of the node and credential.
+- Tested in n8n 2.36.9 and 2.42.7, including discovery of the node and credential. A real n8n workflow against an isolated 1C database with LDO 6.5.1.0 passed process transitions, document updates, and audit verification.
 - Node.js 22.22.0 or later. The tested `n8n-workflow` version is recorded in `package-lock.json`; host compatibility is declared in `peerDependencies`.
 - Requires LDO Relay command contract `1.0` and an extension that supports the selected operation. Available operations depend on the configuration and policy.
 - An operation may wait up to 1800 seconds. Your n8n execution timeout must permit the polling schedule. PDF preparation may wait separately for the result and the file.
@@ -65,7 +65,7 @@ Tests use synthetic responses and never contact a database or Relay service. The
 
 ## Release
 
-See [Release and verification](docs/release.md). GitHub Actions builds and tests the package and publishes it with npm provenance. Publishing and n8n verification are separate stages.
+See [Release and verification](docs/release.md) and the [verification submission details](docs/verification.md). GitHub Actions builds and tests the package and publishes it with npm provenance. Publishing and n8n verification are separate stages.
 
 ## License
 
