@@ -94,3 +94,12 @@ The existing Creator Portal submission passed automated review for the initial r
 ## Required manual-review demonstration
 
 The Creator Portal requests an uninterrupted screen recording of five minutes or less. Install version `0.1.0` from npm in n8n, add the node to a new workflow, configure a credential and show a successful credential test, then execute common operations. If treated as an app node, also show one action used as an AI agent tool. Record only an isolated demo with disposable credentials and fixtures; do not expose tokens or customer data.
+
+
+## Standalone publication record
+
+- [npm 0.2.0](https://www.npmjs.com/package/n8n-nodes-ldo-1c-relay/v/0.2.0).
+- [Tag v0.2.0](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/tree/v0.2.0), commit `9f75265383e95ae26d13f8f5eab9be754b88ad17`.
+- [Successful OIDC Publish workflow](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/actions/runs/38382483325).
+- Full official published-package scan passed, including provenance, attested source and npm JavaScript, on 2026-10-13.
+- Creator Portal still displays Manual Review: Awaiting Video. The package is not verified for n8n Cloud.

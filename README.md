@@ -4,7 +4,7 @@ Connect a 1C database to n8n using your own **standalone queue**, **direct HTTP*
 
 Version 0.2.0 adds the standalone transports. [Standalone connection setup](docs/standalone.md) documents their requirements and limitations. Existing version 1 workflows retain their Relay transport; npm 0.1.1 and earlier remain Relay-only.
 
-**Publication:** releases are published to [npm](https://www.npmjs.com/package/n8n-nodes-ldo-1c-relay) from GitHub Actions with npm provenance. The official scanner passed the 0.2.0 source and packed distribution on 2026-10-13; published-package verification is separate.
+**Publication:** [version 0.2.0 is available on npm](https://www.npmjs.com/package/n8n-nodes-ldo-1c-relay/v/0.2.0), published through [GitHub Actions](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/actions/runs/38382483325) with npm provenance. The full official published-package scanner passed on 2026-10-13.
 
 **Verification status:** this node has not been verified by n8n. The earlier Relay submission passed automated review on 2026-10-13 and is awaiting a demonstration video. Version 0.2.0 requires review of its new transports. Installing through the n8n Cloud node panel requires verification.
 
