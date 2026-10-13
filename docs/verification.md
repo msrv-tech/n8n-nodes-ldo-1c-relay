@@ -54,6 +54,10 @@ Registry provenance and the full published-package scan were confirmed on 2026-1
 - Successful [Publish workflow, attempt 2](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/actions/runs/38346000876/attempts/2).
 - [npm provenance attestation](https://registry.npmjs.org/-/npm/v1/attestations/n8n-nodes-ldo-1c-relay@0.1.0) and [Sigstore transparency entry](https://search.sigstore.dev/?logIndex=3241217395).
 - Official `@n8n/scan-community-package` stable `0.35.1` full registry scan: `passed: true`. The scanner verified provenance, fetched the attested source commit, and analyzed both source and published JavaScript.
-- [Creator Portal submission](https://creators.n8n.io/nodes/n8n-nodes-ldo-1c-relay/integration): ownership confirmed and submission accepted on 2026-10-13; automated review is in progress. No n8n approval has been received.
+- [Creator Portal submission](https://creators.n8n.io/nodes/n8n-nodes-ldo-1c-relay/integration): ownership confirmed and automated review completed successfully on 2026-10-13. Manual review is awaiting a demonstration video. Final n8n approval has not been received.
 
 Do not mark this package verified until n8n approves it.
+
+## Required manual-review demonstration
+
+The Creator Portal requests an uninterrupted screen recording of five minutes or less. Install version `0.1.0` from npm in n8n, add the node to a new workflow, configure a credential and show a successful credential test, then execute common operations. If treated as an app node, also show one action used as an AI agent tool. Record only an isolated demo with disposable credentials and fixtures; do not expose tokens or customer data.
