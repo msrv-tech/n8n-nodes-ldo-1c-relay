@@ -6,7 +6,7 @@ This package integrates LDO Relay. It requires an enrolled 1C database, the comp
 
 **Publication status:** [version 0.1.0 is available on npm](https://www.npmjs.com/package/n8n-nodes-ldo-1c-relay/v/0.1.0), published from GitHub Actions with npm provenance. The official n8n published-package scanner passed on 2026-10-13.
 
-**Verification status:** this node has not been verified by n8n. The Creator Portal submission is awaiting ownership confirmation. Installing through the n8n Cloud node panel requires verification.
+**Verification status:** this node has not been verified by n8n. The Creator Portal submission has been accepted and is undergoing automated review. Installing through the n8n Cloud node panel requires verification.
 
 [n8n](https://n8n.io/) is a workflow automation platform.
 
