@@ -4,7 +4,7 @@ Connect a 1C database to n8n through the **LDO Relay API**. The separately insta
 
 This package integrates LDO Relay. It requires an enrolled 1C database, the compatible LDO extension, and Relay access. It does not connect directly to a database or provide generic access to unrelated APIs.
 
-**Publication status:** [version 0.1.0 is available on npm](https://www.npmjs.com/package/n8n-nodes-ldo-1c-relay/v/0.1.0), published from GitHub Actions with npm provenance. The official n8n published-package scanner passed on 2026-10-13.
+**Publication status:** [version 0.1.1 is available on npm](https://www.npmjs.com/package/n8n-nodes-ldo-1c-relay/v/0.1.1), published from GitHub Actions with npm provenance. The official n8n published-package scanner passed on 2026-10-13.
 
 **Verification status:** this node has not been verified by n8n. The Creator Portal automated review passed on 2026-10-13. Manual review is awaiting a demonstration video. Installing through the n8n Cloud node panel requires verification.
 

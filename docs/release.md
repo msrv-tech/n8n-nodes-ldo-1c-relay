@@ -6,7 +6,7 @@ The GitHub repository, npm package, and n8n verification are separate release st
 
 The `publish.yml` workflow supports npm Trusted Publishing through GitHub OIDC. Configure npm to trust owner `msrv-tech`, repository `n8n-nodes-ldo-1c-relay`, and workflow `publish.yml`. Allow direct `npm publish` and leave the environment name blank. The release uses Node.js 24 and npm 11.21.0.
 
-Trusted Publishing was configured on 2026-10-13. Starting with version `0.1.1`, the release workflow uses OIDC only and does not read `NPM_TOKEN`. Version `0.1.0` used a granular token to bootstrap the first publication. Future releases do not depend on the lifetime of the bootstrap token. Never commit a token or `.npmrc`. See [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/) and [n8n publication requirements](https://docs.n8n.io/integrations/community-nodes/building-community-nodes.md).
+Trusted Publishing was configured and validated by a successful `0.1.1` release on 2026-10-13. npm reports the connection status as **Valid**. Starting with version `0.1.1`, the release workflow uses OIDC only and does not read `NPM_TOKEN`. Version `0.1.0` used a granular token to bootstrap the first publication. Future releases do not depend on the lifetime of the bootstrap token. Never commit a token or `.npmrc`. See [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/) and [n8n publication requirements](https://docs.n8n.io/integrations/community-nodes/building-community-nodes.md).
 
 ## Publish a version
 

@@ -58,6 +58,19 @@ Registry provenance and the full published-package scan were confirmed on 2026-1
 
 Do not mark this package verified until n8n approves it.
 
+## Token-free release 0.1.1
+
+Version `0.1.1` includes updated release and verification documentation; node behavior and credential format are unchanged.
+
+- [npm package version](https://www.npmjs.com/package/n8n-nodes-ldo-1c-relay/v/0.1.1).
+- [Release tag v0.1.1](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/tree/v0.1.1), commit `5b30a9e792bf243ea6fb06ad681325fb92c630c8`.
+- [Successful Publish workflow](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/actions/runs/38349546873): GitHub OIDC authentication; no npm publish secret is read by this workflow.
+- npm Trusted Publisher connection: **Valid**, owner `msrv-tech`, repository `n8n-nodes-ldo-1c-relay`, workflow `publish.yml`, direct publication allowed, no GitHub environment constraint.
+- [npm provenance](https://registry.npmjs.org/-/npm/v1/attestations/n8n-nodes-ldo-1c-relay@0.1.1) and [Sigstore transparency entry](https://search.sigstore.dev/?logIndex=3241662450).
+- Published archive integrity matches the registry metadata. Official full registry scan (`@n8n/scan-community-package` stable `0.35.1`): `passed: true`, including provenance, attested TypeScript source, and published JavaScript.
+
+The existing Creator Portal submission passed automated review for the initial release and awaits its demonstration video. This patch release does not confer n8n verification.
+
 ## Required manual-review demonstration
 
 The Creator Portal requests an uninterrupted screen recording of five minutes or less. Install version `0.1.0` from npm in n8n, add the node to a new workflow, configure a credential and show a successful credential test, then execute common operations. If treated as an app node, also show one action used as an AI agent tool. Record only an isolated demo with disposable credentials and fixtures; do not expose tokens or customer data.
