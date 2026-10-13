@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-ldo-1c-relay",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Connect 1C databases to n8n through the LDO Relay API",
 	"license": "MIT",
 	"homepage": "https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay",
