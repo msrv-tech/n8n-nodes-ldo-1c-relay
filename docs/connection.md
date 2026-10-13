@@ -1,5 +1,7 @@
 # Connection and extension setup
 
+This page describes the managed Relay mode. For your own queue or direct HTTP without MSRV, see [Standalone connections](standalone.md).
+
 ## Prerequisites
 
 You need an LDO Relay enrollment provisioned by the service operator, a supported 1C database, and the LDO extension supplied for that configuration. Obtain the compatible extension and enrollment details from your LDO provider. This repository distributes the n8n node only and does not distribute a CFE binary.

@@ -20,7 +20,7 @@ export class LdoRelayApi implements ICredentialType {
 			displayName: 'Relay URL',
 			name: 'apiUrl',
 			type: 'string',
-			default: 'https://api.ldo.msrv.tech',
+			default: '',
 			required: true,
 			placeholder: 'e.g. https://api.ldo.msrv.tech',
 		},

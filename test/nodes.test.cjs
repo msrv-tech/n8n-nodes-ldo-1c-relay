@@ -25,7 +25,7 @@ function context(parameters, responses, input = [{ json: {} }]) {
 		},
 		getNodeParameter: (name) => parameters[name],
 		getCurrentNodeParameter: (name) => parameters[name],
-		getNode: () => ({ name: '1С через LDO Relay' }),
+		getNode: () => ({ name: '1С через LDO Relay', typeVersion: 1 }),
 		continueOnFail: () => false,
 		helpers: {
 			httpRequestWithAuthentication: async (credentialType, request) => {

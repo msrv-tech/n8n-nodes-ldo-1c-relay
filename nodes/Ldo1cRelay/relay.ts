@@ -8,11 +8,26 @@ import {
 	type JsonObject,
 } from 'n8n-workflow';
 import type { Capabilities, RelayEvent } from './types';
+import { connectionMode, connectionUrl, directCommand } from './connection';
+import { queueCapabilities, queueConfiguration } from './queue';
 
 type RelayContext = IExecuteFunctions | ILoadOptionsFunctions;
 type RelayRequest = Omit<IHttpRequestOptions, 'url'> & { path: string };
 
 export async function configuration(context: RelayContext) {
+	const mode = connectionMode(context);
+	if (mode === 'queue') return { ...(await queueConfiguration(context)), mode };
+	if (mode === 'direct') {
+		const credentials = await context.getCredentials('ldo1cApi');
+		return {
+			apiUrl: connectionUrl(credentials.apiUrl, true),
+			databaseId: '',
+			profileId: String(credentials.profileId),
+			policyRevision: String(credentials.policyRevision),
+			minimumWaitSeconds: 0,
+			mode,
+		};
+	}
 	const credentials = await context.getCredentials('ldoRelayApi');
 	for (const name of ['apiUrl', 'apiToken', 'databaseId', 'profileId', 'policyRevision']) {
 		if (typeof credentials[name] !== 'string' || !String(credentials[name]).trim()) {
@@ -36,6 +51,7 @@ export async function configuration(context: RelayContext) {
 		);
 	}
 	return {
+		mode,
 		apiUrl: url.toString().replace(/\/$/, ''),
 		databaseId: String(credentials.databaseId),
 		profileId: String(credentials.profileId),
@@ -48,6 +64,8 @@ export async function relayRequest<T = RelayEvent>(
 	context: RelayContext,
 	request: RelayRequest,
 ): Promise<T> {
+	if (connectionMode(context) !== 'msrv')
+		throw new Error('Relay requests require the explicit MSRV connection mode');
 	const config = await configuration(context);
 	const { path, ...options } = request;
 	try {
@@ -66,6 +84,8 @@ export async function relayBinaryRequest(
 	context: IExecuteFunctions,
 	path: string,
 ): Promise<unknown> {
+	if (connectionMode(context) !== 'msrv')
+		throw new Error('Relay file requests require the explicit MSRV connection mode');
 	const config = await configuration(context);
 	try {
 		return await context.helpers.httpRequestWithAuthentication.call(context, 'ldoRelayApi', {
@@ -105,6 +125,12 @@ export async function commandEnvelope(
 }
 
 export async function relayCapabilities(context: RelayContext) {
+	if (connectionMode(context) === 'direct')
+		return {
+			capabilities: (await directCommand(context, 'capabilities.get', {})).data as Capabilities,
+		};
+	if (connectionMode(context) === 'queue')
+		return { capabilities: (await queueCapabilities(context)) as Capabilities };
 	const config = await configuration(context);
 	const query = new URLSearchParams({
 		profile_id: config.profileId,

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.0 — 2026-10-13
+
+- Add version 2 with standalone queue as the default and explicit direct/MSRV modes.
+- Persist queue commands, leases, results and events through the n8n Data Tables public API.
+- Add an authenticated gateway for outbound polling from closed 1C databases.
+- Add command submission without waiting, retained result lookup and queue retention.
+- Add direct credentials and integrity-checked standalone PDF results.
+- Preserve version 1 Relay workflows; remove the default MSRV URL from new credentials.
+
+
 ## 0.1.1
 
 - Publish releases through npm Trusted Publishing (GitHub Actions OIDC), without a stored publish token.

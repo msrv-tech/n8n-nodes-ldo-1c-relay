@@ -1,0 +1,7 @@
+{
+	"node": "n8n-nodes-ldo-1c-relay.ldo1cQueueTrigger",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Productivity"],
+	"resources": { "primaryDocumentation": [{ "url": "https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/blob/main/docs/standalone.md" }] }
+}

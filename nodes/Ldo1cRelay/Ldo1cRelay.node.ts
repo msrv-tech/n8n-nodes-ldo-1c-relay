@@ -12,6 +12,15 @@ import {
 	type INodePropertyOptions,
 } from 'n8n-workflow';
 import type { Capabilities, RelayEvent, ReferenceValue } from './types';
+import { connectionMode, directCommand } from './connection';
+import {
+	enqueueCommand,
+	waitCommand,
+	leaseRows,
+	finishEvent,
+	commandResult,
+	cleanupQueue,
+} from './queue';
 import {
 	configuration,
 	operationWaitSeconds,
@@ -142,6 +151,12 @@ async function runCommand(
 	pollSeconds: number,
 ) {
 	const commandId = randomUUID();
+	if (connectionMode(context) === 'direct')
+		return directCommand(context, commandType, payload, commandId, timeoutSeconds);
+	if (connectionMode(context) === 'queue') {
+		await enqueueCommand(context, commandType, commandId, payload);
+		return waitCommand(context, commandId, timeoutSeconds, pollSeconds);
+	}
 	await relayRequest(context, {
 		method: 'POST',
 		path: '/v1/queue/commands',
@@ -161,6 +176,42 @@ async function runCommand(
 	return { commandId, data: result.payload?.data || {} };
 }
 
+async function standalonePdf(
+	context: IExecuteFunctions,
+	file: IDataObject,
+	commandId: string,
+	index: number,
+): Promise<INodeExecutionData> {
+	if (
+		!file ||
+		typeof file.content_base64 !== 'string' ||
+		file.content_base64.length > 12 * 1024 * 1024
+	)
+		throw new UserError('1C returned invalid or oversized standalone PDF data');
+	const encoded = file.content_base64.replace(/\s/g, '');
+	const content = Buffer.from(encoded, 'base64');
+	const sha256 = requiredSha256(file.sha256);
+	if (
+		content.toString('base64') !== encoded ||
+		content.length !== requiredSize(file.size_bytes) ||
+		!content.subarray(0, 5).equals(Buffer.from('%PDF-')) ||
+		createHash('sha256').update(content).digest('hex') !== sha256
+	)
+		throw new UserError('Standalone PDF integrity verification failed');
+	const filename = String(file.filename || 'print-form.pdf');
+	return {
+		json: {
+			sha256,
+			size_bytes: content.length,
+			filename,
+			_ldo: { command_id: commandId, operation: 'n8n.document.file.prepare' },
+		},
+		binary: {
+			data: await context.helpers.prepareBinaryData(content, filename, 'application/pdf'),
+		},
+		pairedItem: { item: index },
+	};
+}
 export class Ldo1cRelay implements INodeType {
 	methods: NonNullable<INodeType['methods']> = {
 		loadOptions: {
@@ -293,20 +344,140 @@ export class Ldo1cRelay implements INodeType {
 		},
 	};
 	description: INodeTypeDescription = {
-		displayName: 'LDO Relay for 1C',
+		displayName: 'LDO 1C',
 		name: 'ldo1cRelay',
 		icon: { light: 'file:ldoRelay.svg', dark: 'file:ldoRelay.dark.svg' },
 		group: ['transform'],
-		version: 1,
+		version: [1, 2],
+		defaultVersion: 2,
 		usableAsTool: true,
-		description: 'Work with a 1C database through the LDO Relay API',
-		credentials: [{ name: 'ldoRelayApi', required: true }],
+		description: 'Work with 1C through your own queue, direct HTTP, or an enrolled MSRV service',
+		credentials: [
+			{
+				name: 'ldoRelayApi',
+				required: true,
+				displayOptions: { show: { connectionMode: ['msrv'] } },
+			},
+			{
+				name: 'ldo1cApi',
+				required: true,
+				displayOptions: { show: { connectionMode: ['direct'] } },
+			},
+			{
+				name: 'ldo1cQueueApi',
+				required: true,
+				displayOptions: { show: { connectionMode: ['queue'] } },
+			},
+		],
 		subtitle:
 			'={{$parameter["resource"] === "operation" ? $parameter["operation"] : $parameter["resource"]}}',
-		defaults: { name: 'LDO Relay for 1C' },
+		defaults: { name: 'LDO 1C' },
 		inputs: [NodeConnectionTypes.Main],
 		outputs: [NodeConnectionTypes.Main],
 		properties: [
+			{
+				displayName: 'Wait for Result',
+				name: 'waitForResult',
+				type: 'boolean',
+				default: true,
+				description:
+					'Whether to wait in this node. Disable to return the Command ID immediately and continue with a Wait node and Queue: Get Result.',
+				displayOptions: {
+					show: { '@version': [2], connectionMode: ['queue'], resource: ['operation'] },
+					hide: { operation: ['referenceFieldUpdate'] },
+				},
+			},
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				noDataExpression: true,
+				default: 'getResult',
+				options: [
+					{ name: 'Get Result', value: 'getResult', action: 'Get a queued command result' },
+					{
+						name: 'Clean Completed Entries',
+						value: 'cleanup',
+						action: 'Clean old completed queue entries',
+					},
+				],
+				displayOptions: {
+					show: { '@version': [2], connectionMode: ['queue'], resource: ['queue'] },
+				},
+			},
+			{
+				displayName: 'Command ID',
+				name: 'queuedCommandId',
+				type: 'string',
+				default: '',
+				required: true,
+				displayOptions: { show: { resource: ['queue'], operation: ['getResult'] } },
+			},
+			{
+				displayName: 'Retention (Days)',
+				name: 'retentionDays',
+				type: 'number',
+				default: 30,
+				typeOptions: { minValue: 1, maxValue: 365 },
+				description:
+					'Remove completed commands and acknowledged events older than this period. Pending, leased, failed delivery and dead entries are retained.',
+				displayOptions: { show: { resource: ['queue'], operation: ['cleanup'] } },
+			},
+
+			{
+				displayName: 'Connection Mode',
+				name: 'connectionMode',
+				type: 'hidden',
+				default: 'msrv',
+				displayOptions: { show: { '@version': [1] } },
+			},
+			{
+				displayName: 'Connection Mode',
+				name: 'connectionMode',
+				type: 'options',
+				noDataExpression: true,
+				default: 'queue',
+				displayOptions: { show: { '@version': [2] } },
+				options: [
+					{
+						name: 'Standalone Queue',
+						value: 'queue',
+						description: 'Use your n8n data table and outbound 1C polling',
+					},
+					{
+						name: 'Direct HTTP',
+						value: 'direct',
+						description: 'Connect to your published 1C HTTP service',
+					},
+					{
+						name: 'MSRV Service',
+						value: 'msrv',
+						description: 'Use an explicitly enrolled MSRV Relay service',
+					},
+				],
+			},
+			{
+				displayName: 'Command ID',
+				name: 'commandId',
+				type: 'string',
+				default: '',
+				description:
+					'Optional UUID. Reuse the same ID and payload to recover a retained queue result after a timeout.',
+				displayOptions: {
+					show: { '@version': [2], connectionMode: ['queue'], resource: ['operation'] },
+				},
+			},
+			{
+				displayName: 'Event Lease Token',
+				name: 'leaseToken',
+				type: 'string',
+				typeOptions: { password: true },
+				default: '',
+				required: true,
+				displayOptions: {
+					show: { '@version': [2], connectionMode: ['queue'], resource: ['finalize'] },
+				},
+			},
 			{
 				displayName: 'Resource',
 				name: 'resource',
@@ -318,6 +489,11 @@ export class Ldo1cRelay implements INodeType {
 					{ name: '1C Operation', value: 'operation' },
 					{ name: 'Event', value: 'events' },
 					{ name: 'Delivery', value: 'finalize' },
+					{
+						name: 'Queue',
+						value: 'queue',
+						displayOptions: { show: { '@version': [2], connectionMode: ['queue'] } },
+					},
 				],
 			},
 			{
@@ -330,79 +506,79 @@ export class Ldo1cRelay implements INodeType {
 					{
 						name: 'Cancel External Process',
 						value: 'processCancel',
-						description: 'Cancel external process through LDO Relay',
+						description: 'Cancel external process using the selected connection',
 						action: 'Cancel external process',
 					},
 					{
 						name: 'Get Capabilities',
 						value: 'capabilities',
-						description: 'Get capabilities through LDO Relay',
+						description: 'Get capabilities using the selected connection',
 						action: 'Get capabilities',
 					},
 					{
 						name: 'Get Catalog Fields',
 						value: 'catalogGet',
-						description: 'Get catalog fields through LDO Relay',
+						description: 'Get catalog fields using the selected connection',
 						action: 'Get catalog fields',
 					},
 					{
 						name: 'Get Document Fields',
 						value: 'documentGet',
-						description: 'Get document fields through LDO Relay',
+						description: 'Get document fields using the selected connection',
 						action: 'Get document fields',
 					},
 					{
 						name: 'Get External Process',
 						value: 'processGet',
-						description: 'Get external process through LDO Relay',
+						description: 'Get external process using the selected connection',
 						action: 'Get external process',
 					},
 					{
 						name: 'Prepare Document PDF',
 						value: 'documentFilePrepare',
-						description: 'Prepare document PDF through LDO Relay',
+						description: 'Prepare document PDF using the selected connection',
 						action: 'Prepare document PDF',
 					},
 					{
 						name: 'Search Reference Values',
 						value: 'referenceSearch',
-						description: 'Search reference values through LDO Relay',
+						description: 'Search reference values using the selected connection',
 						action: 'Search reference values',
 					},
 					{
 						name: 'Start External Process',
 						value: 'processStart',
-						description: 'Start external process through LDO Relay',
+						description: 'Start external process using the selected connection',
 						action: 'Start external process',
 					},
 					{
 						name: 'Transition External Process',
 						value: 'processTransition',
-						description: 'Transition external process through LDO Relay',
+						description: 'Transition external process using the selected connection',
 						action: 'Transition external process',
 					},
 					{
 						name: 'Update Catalog Fields',
 						value: 'catalogFieldsUpdate',
-						description: 'Update catalog fields through LDO Relay',
+						description: 'Update catalog fields using the selected connection',
 						action: 'Update catalog fields',
 					},
 					{
 						name: 'Update Document Fields',
 						value: 'documentFieldsUpdate',
-						description: 'Update document fields through LDO Relay',
+						description: 'Update document fields using the selected connection',
 						action: 'Update document fields',
 					},
 					{
 						name: 'Update External Process Fields',
 						value: 'processFieldsUpdate',
-						description: 'Update external process fields through LDO Relay',
+						description: 'Update external process fields using the selected connection',
 						action: 'Update external process fields',
 					},
 					{
 						name: 'Update Reference Field',
 						value: 'referenceFieldUpdate',
-						description: 'Update reference field through LDO Relay',
+						description: 'Update reference field using the selected connection',
 						action: 'Update reference field',
 					},
 				],
@@ -987,7 +1163,11 @@ export class Ldo1cRelay implements INodeType {
 				pairedItem: { item: index },
 			};
 		}
-		const commandId = randomUUID();
+		const requestedId =
+			connectionMode(this) === 'queue'
+				? String(this.getNodeParameter('commandId', index, '') || '').toLowerCase()
+				: '';
+		const commandId = requestedId || randomUUID();
 		let commandType = 'n8n.capabilities.get';
 		let payload: IDataObject = {};
 		if (operation === 'processStart') {
@@ -1079,6 +1259,37 @@ export class Ldo1cRelay implements INodeType {
 				};
 			}
 		}
+		const mode = connectionMode(this);
+		if (mode !== 'msrv') {
+			if (operation === 'documentFilePrepare' && mode === 'direct') {
+				const capabilities = (await directCommand(this, 'capabilities.get', {})).data;
+				if (capabilities.standalone_file_transfer !== true)
+					throw new UserError('This extension does not support standalone PDF transfer');
+			}
+			let completed;
+			if (mode === 'queue') {
+				await enqueueCommand(this, commandType, commandId, payload);
+				if (this.getNodeParameter('waitForResult', index, true) === false)
+					return {
+						json: {
+							status: 'queued',
+							command_id: commandId,
+							_ldo: { command_id: commandId, operation: commandType },
+						},
+						pairedItem: { item: index },
+					};
+				completed = await waitCommand(this, commandId, timeout, poll);
+			} else completed = await directCommand(this, commandType, payload, commandId, timeout);
+			if (operation === 'documentFilePrepare')
+				return standalonePdf(this, completed.data.file as IDataObject, commandId, index);
+			return {
+				json: {
+					...completed.data,
+					_ldo: { command_id: commandId, operation: commandType },
+				},
+				pairedItem: { item: index },
+			};
+		}
 		await relayRequest(this, {
 			method: 'POST',
 			path: '/v1/queue/commands',
@@ -1123,8 +1334,53 @@ export class Ldo1cRelay implements INodeType {
 		};
 	}
 
+	async queue(this: IExecuteFunctions, index: number): Promise<INodeExecutionData> {
+		if (connectionMode(this) !== 'queue')
+			throw new UserError('Queue operations require a standalone queue connection');
+		if (this.getNodeParameter('operation', index) === 'cleanup')
+			return {
+				json: await cleanupQueue(this, this.getNodeParameter('retentionDays', index) as number),
+				pairedItem: { item: index },
+			};
+		const id = String(this.getNodeParameter('queuedCommandId', index)).toLowerCase();
+		const result = await commandResult(this, id);
+		if (result.status === 'succeeded' && result.command_type === 'document.file.prepare') {
+			const output = await standalonePdf(
+				this,
+				(result.data as IDataObject).file as IDataObject,
+				id,
+				index,
+			);
+			output.json.status = 'succeeded';
+			return output;
+		}
+		return { json: { ...result, _ldo: { command_id: id } }, pairedItem: { item: index } };
+	}
+
 	async events(this: IExecuteFunctions, index: number): Promise<INodeExecutionData[]> {
+		if (connectionMode(this) === 'direct')
+			throw new UserError(
+				'Direct connections receive events through a separately configured webhook subscription',
+			);
 		const types = this.getNodeParameter('eventTypes', index) as string[];
+		if (connectionMode(this) === 'queue') {
+			const rows = await leaseRows(
+				this,
+				'event',
+				this.getNodeParameter('limit', index) as number,
+				types,
+			);
+			return rows.map((row) => ({
+				json: {
+					id: row.id,
+					external_id: row.command_id,
+					item_type: row.command_type,
+					payload: JSON.parse(row.payload),
+					_ldo: { event_id: row.id, lease_token: row.lease_token },
+				},
+				pairedItem: { item: index },
+			}));
+		}
 		const query = new URLSearchParams({
 			limit: String(this.getNodeParameter('limit', index) as number),
 		});
@@ -1142,6 +1398,23 @@ export class Ldo1cRelay implements INodeType {
 	async finalize(this: IExecuteFunctions, index: number): Promise<INodeExecutionData> {
 		const eventId = this.getNodeParameter('eventId', index) as number;
 		const action = this.getNodeParameter('finalizeAction', index) as string;
+		if (connectionMode(this) === 'direct')
+			throw new UserError('Direct connections do not use queue delivery acknowledgements');
+		if (connectionMode(this) === 'queue') {
+			if (action === 'file')
+				throw new UserError(
+					'Standalone PDFs are returned with the command result; confirm delivery in your destination workflow',
+				);
+			const data = await finishEvent(
+				this,
+				eventId,
+				this.getNodeParameter('leaseToken', index) as string,
+				action === 'fail'
+					? (this.getNodeParameter('retryAfterSeconds', index) as number)
+					: undefined,
+			);
+			return { json: data, pairedItem: { item: index } };
+		}
 		if (action === 'fail') {
 			const result = await relayRequest(this, {
 				method: 'POST',
@@ -1174,7 +1447,8 @@ export class Ldo1cRelay implements INodeType {
 				// n8n invokes execute with its execution context, not the node instance.
 				// Keep the action implementations on the class for testability, but call
 				// them explicitly with that context rather than reading instance methods.
-				if (action === 'events')
+				if (action === 'queue') output.push(await Ldo1cRelay.prototype.queue.call(this, index));
+				else if (action === 'events')
 					output.push(...(await Ldo1cRelay.prototype.events.call(this, index)));
 				else if (action === 'finalize')
 					output.push(await Ldo1cRelay.prototype.finalize.call(this, index));

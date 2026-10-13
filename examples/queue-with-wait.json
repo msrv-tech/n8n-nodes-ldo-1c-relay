@@ -1,0 +1,167 @@
+{
+	"name": "Standalone 1C queue with persisted wait",
+	"nodes": [
+		{
+			"id": "start",
+			"name": "Start",
+			"type": "n8n-nodes-base.manualTrigger",
+			"typeVersion": 1,
+			"position": [
+				200,
+				300
+			],
+			"parameters": {}
+		},
+		{
+			"id": "submit",
+			"name": "Queue command",
+			"type": "n8n-nodes-ldo-1c-relay.ldo1cRelay",
+			"typeVersion": 2,
+			"position": [
+				450,
+				300
+			],
+			"parameters": {
+				"connectionMode": "queue",
+				"resource": "operation",
+				"operation": "capabilities",
+				"waitForResult": false
+			}
+		},
+		{
+			"id": "wait",
+			"name": "Wait for 1C",
+			"type": "n8n-nodes-base.wait",
+			"typeVersion": 1.1,
+			"position": [
+				700,
+				300
+			],
+			"parameters": {
+				"resume": "timeInterval",
+				"amount": 5,
+				"unit": "minutes"
+			}
+		},
+		{
+			"id": "result",
+			"name": "Get result",
+			"type": "n8n-nodes-ldo-1c-relay.ldo1cRelay",
+			"typeVersion": 2,
+			"position": [
+				950,
+				300
+			],
+			"parameters": {
+				"connectionMode": "queue",
+				"resource": "queue",
+				"operation": "getResult",
+				"queuedCommandId": "={{ $(\"Queue command\").first().json.command_id }}"
+			}
+		},
+		{
+			"id": "pending",
+			"name": "Still pending",
+			"type": "n8n-nodes-base.if",
+			"typeVersion": 2.2,
+			"position": [
+				1200,
+				300
+			],
+			"parameters": {
+				"conditions": {
+					"options": {
+						"caseSensitive": true,
+						"leftValue": "",
+						"typeValidation": "strict",
+						"version": 2
+					},
+					"conditions": [
+						{
+							"id": "pending",
+							"leftValue": "={{ $json.status }}",
+							"rightValue": "pending",
+							"operator": {
+								"type": "string",
+								"operation": "equals"
+							}
+						},
+						{
+							"id": "leased",
+							"leftValue": "={{ $json.status }}",
+							"rightValue": "leased",
+							"operator": {
+								"type": "string",
+								"operation": "equals"
+							}
+						}
+					],
+					"combinator": "or"
+				},
+				"options": {}
+			}
+		}
+	],
+	"connections": {
+		"Start": {
+			"main": [
+				[
+					{
+						"node": "Queue command",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Queue command": {
+			"main": [
+				[
+					{
+						"node": "Wait for 1C",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Wait for 1C": {
+			"main": [
+				[
+					{
+						"node": "Get result",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Get result": {
+			"main": [
+				[
+					{
+						"node": "Still pending",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Still pending": {
+			"main": [
+				[
+					{
+						"node": "Wait for 1C",
+						"type": "main",
+						"index": 0
+					}
+				],
+				[]
+			]
+		}
+	},
+	"settings": {
+		"executionOrder": "v1"
+	},
+	"active": false
+}

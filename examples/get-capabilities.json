@@ -7,20 +7,27 @@
 			"name": "Manual Trigger",
 			"type": "n8n-nodes-base.manualTrigger",
 			"typeVersion": 1,
-			"position": [0, 0]
+			"position": [
+				0,
+				0
+			]
 		},
 		{
 			"parameters": {
 				"resource": "operation",
 				"operation": "capabilities",
 				"timeoutSeconds": 900,
-				"pollSeconds": 2
+				"pollSeconds": 2,
+				"connectionMode": "queue"
 			},
 			"id": "capabilities",
 			"name": "Get Capabilities",
 			"type": "n8n-nodes-ldo-1c-relay.ldo1cRelay",
-			"typeVersion": 1,
-			"position": [240, 0]
+			"typeVersion": 2,
+			"position": [
+				240,
+				0
+			]
 		}
 	],
 	"connections": {

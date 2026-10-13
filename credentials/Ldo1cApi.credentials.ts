@@ -1,0 +1,96 @@
+import { validateCredentialTarget } from '../nodes/Ldo1cRelay/connection';
+import type {
+	IAuthenticate,
+	ICredentialTestRequest,
+	ICredentialType,
+	INodeProperties,
+	Icon,
+} from 'n8n-workflow';
+
+export class Ldo1cApi implements ICredentialType {
+	name = 'ldo1cApi';
+	displayName = 'LDO 1C Direct API';
+	icon: Icon = {
+		light: 'file:../nodes/Ldo1cRelay/ldoRelay.svg',
+		dark: 'file:../nodes/Ldo1cRelay/ldoRelay.dark.svg',
+	};
+	documentationUrl =
+		'https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/blob/main/docs/standalone.md';
+	properties: INodeProperties[] = [
+		{
+			displayName: '1C Service URL',
+			name: 'apiUrl',
+			type: 'string',
+			default: '',
+			required: true,
+			placeholder: 'https://1c.example.com/base/hs/ldo_n8n',
+		},
+		{ displayName: 'Username', name: 'username', type: 'string', default: '', required: true },
+		{
+			displayName: 'Password',
+			name: 'password',
+			type: 'string',
+			default: '',
+			typeOptions: { password: true },
+		},
+		{
+			displayName: 'Profile Token',
+			name: 'profileToken',
+			type: 'string',
+			default: '',
+			required: true,
+			typeOptions: { password: true },
+		},
+		{ displayName: 'Profile ID', name: 'profileId', type: 'string', default: '', required: true },
+		{
+			displayName: 'Policy Revision',
+			name: 'policyRevision',
+			type: 'string',
+			default: '',
+			required: true,
+		},
+	];
+	authenticate: IAuthenticate = async (credentials, requestOptions) => {
+		validateCredentialTarget(credentials.apiUrl, requestOptions);
+		return {
+			...requestOptions,
+			disableFollowRedirect: true,
+			auth: {
+				username: String(credentials.username),
+				password: String(credentials.password ?? ''),
+			},
+			headers: {
+				...requestOptions.headers,
+				'X-LDO-Profile-Token': String(credentials.profileToken),
+			},
+		};
+	};
+	test: ICredentialTestRequest = {
+		request: {
+			baseURL: '={{$credentials.apiUrl.replace(/\\/$/, "")}}',
+			url: '/commands',
+			method: 'POST',
+			json: true,
+			disableFollowRedirect: true,
+			body: {
+				contract_version: '1.0',
+				command_id: '00000000-0000-4000-8000-000000000001',
+				command_type: 'capabilities.get',
+				payload: {
+					profile_id: '={{$credentials.profileId}}',
+					policy_revision: '={{$credentials.policyRevision}}',
+				},
+			},
+		},
+		rules: [
+			{
+				type: 'responseSuccessBody',
+				properties: {
+					key: 'status',
+					value: 'failed',
+					message: 'The local 1C profile rejected the capabilities request',
+				},
+			},
+		],
+	};
+}
