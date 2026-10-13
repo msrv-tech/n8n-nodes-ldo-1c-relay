@@ -45,8 +45,15 @@ Prepublication checks on 2026-10-13 passed:
 - Registration, encrypted credential storage, and authenticated workflow execution in a disposable n8n 2.36.9 instance.
 - A real n8n 2.36.9 workflow through Relay to an isolated 1C database with LDO 6.5.1.0. Seven operations completed: process start, transition, process-field update, final transition, document read, document-field update, and process get. The final process was approved at revision 4, four audit events matched, the document comment changed, and fixtures were removed.
 
-Registry provenance and the full published-package scan must be confirmed after the GitHub Actions release succeeds. These prepublication results do not constitute n8n verification.
+Registry provenance and the full published-package scan were confirmed on 2026-10-13. These results do not constitute n8n verification.
 
-## Record after publishing
+## Publication record
 
-Record the npm package/version URL, GitHub release tag and commit, successful Publish workflow URL, npm provenance statement, full scanner result, and Creator Portal submission identifier. Do not mark this package verified until n8n approves it.
+- Package: [n8n-nodes-ldo-1c-relay@0.1.0](https://www.npmjs.com/package/n8n-nodes-ldo-1c-relay/v/0.1.0).
+- Release tag: [v0.1.0](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/tree/v0.1.0), commit `2ebfe727aea675c9f01d06f9be330f3e2dc0f96c`.
+- Successful [Publish workflow, attempt 2](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/actions/runs/38346000876/attempts/2).
+- [npm provenance attestation](https://registry.npmjs.org/-/npm/v1/attestations/n8n-nodes-ldo-1c-relay@0.1.0) and [Sigstore transparency entry](https://search.sigstore.dev/?logIndex=3241217395).
+- Official `@n8n/scan-community-package` stable `0.35.1` full registry scan: `passed: true`. The scanner verified provenance, fetched the attested source commit, and analyzed both source and published JavaScript.
+- Creator Portal: ownership-confirmation step reached; submission is awaiting email verification. No submission identifier or n8n approval has been received.
+
+Do not mark this package verified until n8n approves it.
