@@ -580,7 +580,20 @@ async function testCorruptPdfDoesNotConfirmDelivery() {
 	);
 }
 
+async function testExplicitMsrvVersionTwo() {
+	const run = context({ resource: 'operation', operation: 'capabilities', timeoutSeconds: 1, pollSeconds: 1 }, [
+		{ status: 'accepted' },
+		{ id: 71, payload: { status: 'succeeded', data: { msrv: true } } },
+		{ status: 'acknowledged' },
+	]);
+	run.getNode = () => ({ name: 'Enrolled MSRV', typeVersion: 2, parameters: { connectionMode: 'msrv' } });
+	const result = await Ldo1cRelay.prototype.execute.call(run);
+	assert.equal(result[0][0].json.msrv, true);
+	assert.equal(run.requests.length, 3);
+}
+
 Promise.resolve()
+	.then(testExplicitMsrvVersionTwo)
 	.then(testMinimumWait)
 	.then(testCredentialIsolationAndValidation)
 	.then(testAmbiguousReferenceDoesNotWrite)

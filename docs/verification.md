@@ -24,13 +24,33 @@ The operator issues a token scoped to one enrolled database. The credential also
 
 Requests use Bearer authentication to the configured Relay URL. The node reads no environment variables or local files and declares no runtime dependencies. PDF data uses n8n's binary-data helpers; size, header, and SHA-256 are checked before returning a file.
 
-## Reviewer setup
+## Standalone reviewer setup for 0.2.0
+
+Use self-hosted n8n 2.36.9 and the separately supplied UNF extension 6.6.1.0.
+Follow [Standalone connection setup](standalone.md) to create your own Data Table,
+API credential and authenticated queue gateway. MSRV enrollment is unnecessary.
+Review the queue's production webhook and the action node as distinct nodes.
+
+Test Get Capabilities, document read/update and PDF on disposable native fixtures.
+Exercise event lease/retry/acknowledgement and the Wait/Get Result pattern. Connect
+the action node as an AI tool to your own model. Repeat using Direct HTTP when the
+test database has a publication. Update both gateway and action credentials after
+changing the local policy revision.
+
+Actual standalone workflows passed for capabilities, native invoice reads, PDF,
+events, a persisted 65-second Wait and an AI Agent using local Ollama. Eight
+competing Data Table lease requests produced one owner, retained results survived
+an n8n restart, and queue gateway polling created zero workflow executions.
+These checks used self-hosted n8n; they do not establish n8n Cloud compatibility
+or manual verification of version 0.2.0.
+
+## Historical Relay reviewer setup for 0.1.x
 
 1. Install the published package on a clean n8n instance.
 2. Obtain an isolated test enrollment and compatible LDO extension from the service operator. Do not use customer data. No production or demo credentials are included in this repository.
 3. Install the extension in the test 1C database, enable outbound polling, and publish a narrow test policy. See the connection guide.
 4. Create an LDO Relay API credential with the issued database, token, profile, and policy identifiers. Match the minimum wait to the polling schedule.
-5. Import `examples/get-capabilities.json`, select that credential, and execute Get Capabilities. Verify the dynamic object and field options.
+5. Import the Get Capabilities example from the reviewed 0.1.x package, select that credential, and execute Get Capabilities. With the 0.2.0 example, explicitly select MSRV Service. Verify the dynamic object and field options.
 6. Test a document read and a permitted field update on an unposted fixture. Confirm that an unknown field and stale revision are rejected.
 7. Exercise an external process with start, transition, process-field update, and get. Check the local process state and audit; process fields must remain separate from document fields.
 8. Remove fixtures and revoke the test enrollment token after review.
