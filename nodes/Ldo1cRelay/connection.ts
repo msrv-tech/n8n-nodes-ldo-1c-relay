@@ -51,6 +51,41 @@ export function requiredCredential(credentials: IDataObject, name: string) {
 	return String(credentials[name]);
 }
 
+export async function directConnection(context: OperationContext, timeoutSeconds = 60) {
+	const credentials = await context.getCredentials('ldo1cApi');
+	const apiUrl = connectionUrl(requiredCredential(credentials, 'apiUrl'), true);
+	requiredCredential(credentials, 'username');
+	const descriptor = (await context.helpers.httpRequestWithAuthentication.call(
+		context,
+		'ldo1cApi',
+		{
+			method: 'GET',
+			url: `${apiUrl}/connection`,
+			json: true,
+			disableFollowRedirect: true,
+			timeout: timeoutSeconds * 1000,
+		},
+	)) as IDataObject;
+	if (
+		descriptor?.contract_version !== '1.0' ||
+		descriptor.status !== 'connected' ||
+		typeof descriptor.profile_id !== 'string' ||
+		!descriptor.profile_id ||
+		typeof descriptor.policy_revision !== 'string' ||
+		!descriptor.policy_revision ||
+		!descriptor.capabilities ||
+		typeof descriptor.capabilities !== 'object' ||
+		Array.isArray(descriptor.capabilities)
+	)
+		throw new UserError('1C did not provide an enabled profile for this user');
+	return {
+		apiUrl,
+		profileId: descriptor.profile_id,
+		policyRevision: descriptor.policy_revision,
+		capabilities: descriptor.capabilities as IDataObject,
+	};
+}
+
 export async function directCommand(
 	context: OperationContext,
 	commandType: string,
@@ -58,14 +93,11 @@ export async function directCommand(
 	commandId: string = randomUUID(),
 	timeoutSeconds = 60,
 ) {
-	const credentials = await context.getCredentials('ldo1cApi');
-	const apiUrl = connectionUrl(requiredCredential(credentials, 'apiUrl'), true);
-	for (const field of ['username', 'profileToken', 'profileId', 'policyRevision'])
-		requiredCredential(credentials, field);
+	const config = await directConnection(context, timeoutSeconds);
 	const type = commandType.replace(/^n8n\./, '');
 	const result = (await context.helpers.httpRequestWithAuthentication.call(context, 'ldo1cApi', {
 		method: 'POST',
-		url: `${apiUrl}/commands`,
+		url: `${config.apiUrl}/commands`,
 		json: true,
 		disableFollowRedirect: true,
 		timeout: timeoutSeconds * 1000,
@@ -75,8 +107,8 @@ export async function directCommand(
 			command_type: type,
 			payload: {
 				...payload,
-				profile_id: credentials.profileId,
-				policy_revision: credentials.policyRevision,
+				profile_id: config.profileId,
+				policy_revision: config.policyRevision,
 			},
 		},
 	})) as IDataObject;

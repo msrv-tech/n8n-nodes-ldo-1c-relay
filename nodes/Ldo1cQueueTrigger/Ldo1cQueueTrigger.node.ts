@@ -1,12 +1,23 @@
-import { createHash, timingSafeEqual } from 'node:crypto';
 import {
+	UserError,
 	NodeConnectionTypes,
 	type INodeType,
 	type INodeTypeDescription,
+	type ILoadOptionsFunctions,
 	type IWebhookFunctions,
 	type IWebhookResponseData,
 } from 'n8n-workflow';
-import { queueConfiguration, queueRpc, validateQueueTable } from '../Ldo1cRelay/queue';
+import { queueConfiguration, pinQueueConfiguration, queueRpc } from '../Ldo1cRelay/queue';
+import {
+	connectionRecord,
+	connectionCommandRow,
+	listQueueConnections,
+	matchesSecret,
+	pairQueue,
+	retireStaleCommands,
+	synchronizeQueuePolicy,
+	validateConnectionTable,
+} from '../Ldo1cRelay/pairing';
 
 export class Ldo1cQueueTrigger implements INodeType {
 	description: INodeTypeDescription = {
@@ -17,10 +28,9 @@ export class Ldo1cQueueTrigger implements INodeType {
 			dark: 'file:../Ldo1cRelay/ldoRelay.dark.svg',
 		},
 		group: ['trigger'],
-		version: 1,
+		version: 2,
 		subtitle: 'Standalone 1C queue',
-		description:
-			'Receive outbound queue requests from a closed 1C database using your own n8n data table',
+		description: 'Pair and exchange commands with a closed 1C database through your own n8n queue',
 		defaults: { name: 'LDO 1C Queue Gateway' },
 		inputs: [],
 		outputs: [NodeConnectionTypes.Main],
@@ -36,22 +46,40 @@ export class Ldo1cQueueTrigger implements INodeType {
 		],
 		properties: [
 			{
+				displayName: 'Connection Name or ID',
+				name: 'connectionId',
+				type: 'options',
+				noDataExpression: true,
+				default: '',
+				required: true,
+				typeOptions: { loadOptionsMethod: 'getConnections' },
+				description:
+					'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+			},
+			{
 				displayName:
-					'Connect the production webhook URL to the 1C queue settings. Queue requests persist data and return directly without starting the workflow.',
+					'Create a connection in LDO 1C → Connection, then paste its pairing code into 1C. This gateway returns directly without starting workflow executions.',
 				name: 'notice',
 				type: 'notice',
 				default: '',
 			},
 		],
 	};
+	methods = {
+		loadOptions: {
+			async getConnections(this: ILoadOptionsFunctions) {
+				return await listQueueConnections(this);
+			},
+		},
+	};
 	webhookMethods: NonNullable<INodeType['webhookMethods']> = {
 		default: {
 			async checkExists() {
-				await validateQueueTable(this);
+				await validateConnectionTable(this);
 				return true;
 			},
 			async create() {
-				await validateQueueTable(this);
+				await validateConnectionTable(this);
 				return true;
 			},
 			async delete() {
@@ -59,24 +87,60 @@ export class Ldo1cQueueTrigger implements INodeType {
 			},
 		},
 	};
-	// 1C polls an n8n-owned URL configured by its administrator. No webhook is
-	// registered on the closed database; n8n owns route activation and removal.
 	async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
 		const response = this.getResponseObject();
 		try {
-			const config = await queueConfiguration(this);
-			const supplied = this.getHeaderData()['x-ldo-queue-token'];
-			const hash = (value: string) => createHash('sha256').update(value).digest();
+			const body = this.getBodyData();
+			if (!body || Array.isArray(body) || body.contract_version !== '1.0')
+				throw new UserError('Invalid request');
+			if (body.action === 'pair') {
+				response
+					.status(200)
+					.json(await pairQueue(this, body, this.getHeaderData()['x-ldo-pairing-token']));
+				return { noWebhookResponse: true };
+			}
+			let saved = await connectionRecord(this);
 			if (
-				typeof supplied !== 'string' ||
-				!timingSafeEqual(hash(supplied), hash(config.queueToken))
+				saved.row.status !== 'paired' ||
+				!matchesSecret(this.getHeaderData()['x-ldo-queue-token'], saved.manifest.token_hash)
 			) {
 				response.status(401).json({ error: 'access_denied' });
 				return { noWebhookResponse: true };
 			}
-			response.status(200).json(await queueRpc(this, this.getBodyData()));
+			if (body.database_id !== saved.row.database_id || body.profile_id !== saved.row.profile_id)
+				throw new UserError('Invalid scope');
+			if (body.action === 'sync') {
+				saved = await synchronizeQueuePolicy(this, body, saved);
+				await retireStaleCommands(this, saved);
+				response
+					.status(200)
+					.json({
+						status: 'ok',
+						contract_version: '1.0',
+						policy_revision: saved.row.policy_revision,
+					});
+				return { noWebhookResponse: true };
+			}
+			if (body.action !== 'result' && body.policy_revision !== saved.row.policy_revision)
+				throw new UserError('Invalid policy');
+			const config = await queueConfiguration(this);
+			// In-flight responses belong to the revision under which they were leased.
+			if (body.action === 'result') {
+				const row = await connectionCommandRow(this, saved, Number(body.id));
+				if (
+					body.policy_revision !== saved.row.policy_revision &&
+					body.policy_revision !== row.policy_revision
+				)
+					throw new UserError('Invalid result policy');
+				pinQueueConfiguration(this, { ...config, policyRevision: String(row.policy_revision) });
+				response
+					.status(200)
+					.json(await queueRpc(this, { ...body, policy_revision: row.policy_revision }));
+			} else {
+				if (body.action === 'poll') await retireStaleCommands(this, saved);
+				response.status(200).json(await queueRpc(this, body));
+			}
 		} catch {
-			// Responses must not disclose n8n API credentials, table contents or URLs.
 			response.status(400).json({ error: 'queue_request_failed' });
 		}
 		return { noWebhookResponse: true };

@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-ldo-1c-relay",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"description": "Connect 1C to n8n using your own queue, direct HTTP, or an enrolled MSRV service",
 	"license": "MIT",
 	"homepage": "https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay",
@@ -26,7 +26,7 @@
 		"lint:fix": "n8n-node lint --fix",
 		"release": "n8n-node release",
 		"prepublishOnly": "npm run check",
-		"test": "node test/nodes.test.cjs && node test/standalone.test.cjs",
+		"test": "node test/nodes.test.cjs && node test/standalone.test.cjs && node test/pairing.test.cjs",
 		"check": "npm run lint && npm run build && npm test"
 	},
 	"files": [

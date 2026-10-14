@@ -1,0 +1,50 @@
+{
+  "name": "Create LDO 1C queue connection",
+  "nodes": [
+    {
+      "id": "415b31bc-6f5d-41cc-9d23-ec1b250728f0",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "4303f012-45a6-46b8-b236-ca495a4acef0",
+      "name": "Create connection",
+      "type": "n8n-nodes-ldo-1c-relay.ldo1cRelay",
+      "typeVersion": 2,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "connectionMode": "queue",
+        "resource": "connection",
+        "operation": "createConnection",
+        "connectionName": "My 1C"
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Create connection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none"
+  }
+}

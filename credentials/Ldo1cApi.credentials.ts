@@ -33,22 +33,6 @@ export class Ldo1cApi implements ICredentialType {
 			default: '',
 			typeOptions: { password: true },
 		},
-		{
-			displayName: 'Profile Token',
-			name: 'profileToken',
-			type: 'string',
-			default: '',
-			required: true,
-			typeOptions: { password: true },
-		},
-		{ displayName: 'Profile ID', name: 'profileId', type: 'string', default: '', required: true },
-		{
-			displayName: 'Policy Revision',
-			name: 'policyRevision',
-			type: 'string',
-			default: '',
-			required: true,
-		},
 	];
 	authenticate: IAuthenticate = async (credentials, requestOptions) => {
 		validateCredentialTarget(credentials.apiUrl, requestOptions);
@@ -59,28 +43,15 @@ export class Ldo1cApi implements ICredentialType {
 				username: String(credentials.username),
 				password: String(credentials.password ?? ''),
 			},
-			headers: {
-				...requestOptions.headers,
-				'X-LDO-Profile-Token': String(credentials.profileToken),
-			},
 		};
 	};
 	test: ICredentialTestRequest = {
 		request: {
 			baseURL: '={{$credentials.apiUrl.replace(/\\/$/, "")}}',
-			url: '/commands',
-			method: 'POST',
+			url: '/connection',
+			method: 'GET',
 			json: true,
 			disableFollowRedirect: true,
-			body: {
-				contract_version: '1.0',
-				command_id: '00000000-0000-4000-8000-000000000001',
-				command_type: 'capabilities.get',
-				payload: {
-					profile_id: '={{$credentials.profileId}}',
-					policy_revision: '={{$credentials.policyRevision}}',
-				},
-			},
 		},
 		rules: [
 			{
@@ -88,7 +59,7 @@ export class Ldo1cApi implements ICredentialType {
 				properties: {
 					key: 'status',
 					value: 'failed',
-					message: 'The local 1C profile rejected the capabilities request',
+					message: 'The native 1C user does not have an enabled direct access profile',
 				},
 			},
 		],

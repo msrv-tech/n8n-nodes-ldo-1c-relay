@@ -8,7 +8,7 @@ import {
 	type JsonObject,
 } from 'n8n-workflow';
 import type { Capabilities, RelayEvent } from './types';
-import { connectionMode, connectionUrl, directCommand } from './connection';
+import { connectionMode, connectionUrl, directConnection } from './connection';
 import { queueCapabilities, queueConfiguration } from './queue';
 
 type RelayContext = IExecuteFunctions | ILoadOptionsFunctions;
@@ -22,8 +22,8 @@ export async function configuration(context: RelayContext) {
 		return {
 			apiUrl: connectionUrl(credentials.apiUrl, true),
 			databaseId: '',
-			profileId: String(credentials.profileId),
-			policyRevision: String(credentials.policyRevision),
+			profileId: '',
+			policyRevision: '',
 			minimumWaitSeconds: 0,
 			mode,
 		};
@@ -127,7 +127,7 @@ export async function commandEnvelope(
 export async function relayCapabilities(context: RelayContext) {
 	if (connectionMode(context) === 'direct')
 		return {
-			capabilities: (await directCommand(context, 'capabilities.get', {})).data as Capabilities,
+			capabilities: (await directConnection(context)).capabilities as unknown as Capabilities,
 		};
 	if (connectionMode(context) === 'queue')
 		return { capabilities: (await queueCapabilities(context)) as Capabilities };

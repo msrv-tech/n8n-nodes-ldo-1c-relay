@@ -33,26 +33,7 @@ export class Ldo1cQueueApi implements ICredentialType {
 			required: true,
 			typeOptions: { password: true },
 			description:
-				'API key for the queue data table. This key stays in n8n and must never be shared with 1C.',
-		},
-		{ displayName: 'Queue Table ID', name: 'tableId', type: 'string', default: '', required: true },
-		{ displayName: 'Database ID', name: 'databaseId', type: 'string', default: '', required: true },
-		{ displayName: 'Profile ID', name: 'profileId', type: 'string', default: '', required: true },
-		{
-			displayName: 'Policy Revision',
-			name: 'policyRevision',
-			type: 'string',
-			default: '',
-			required: true,
-		},
-		{
-			displayName: '1C Queue Token',
-			name: 'queueToken',
-			type: 'string',
-			default: '',
-			required: true,
-			typeOptions: { password: true },
-			description: 'Separate shared token for 1C polling. Use at least 32 random characters.',
+				'API key with permissions to read/write data tables and create/activate gateway workflows. This key stays in n8n and must never be shared with 1C.',
 		},
 		{
 			displayName: 'Minimum Wait (Seconds)',
@@ -73,7 +54,7 @@ export class Ldo1cQueueApi implements ICredentialType {
 	test: ICredentialTestRequest = {
 		request: {
 			baseURL: '={{$credentials.apiUrl.replace(/\\/$/, "")}}',
-			url: '=/api/v1/data-tables/{{$credentials.tableId}}',
+			url: '/api/v1/data-tables?limit=1',
 			method: 'GET',
 			disableFollowRedirect: true,
 		},

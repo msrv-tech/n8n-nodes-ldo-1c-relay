@@ -1,12 +1,15 @@
 # Standalone 1C connections
 
+This guide describes the prepared 0.3.0 source and matching UNF 6.7.1.0
+extension. npm 0.2.0 does not include the simple credentials or pairing wizard.
+
 Node version 2 defaults to **Standalone Queue**. It never supplies an MSRV URL,
 activation key, subscription check, or Relay fallback. Your n8n and compatible
 1C extension handle the exchange. MSRV services require separate, explicit
 onboarding and valid service credentials.
 
 The extension is distributed separately under its own terms. Standalone
-transport requires the new extension implementation, tested on UNF 6.6.1.0.
+transport requires the new extension implementation, introduced in UNF 6.7.1.0.
 Older Relay-only extensions are not standalone-compatible. Other configurations
 require their own compatible extension release and validation.
 
@@ -21,35 +24,43 @@ The initial tested environment is self-hosted n8n 2.36.9. n8n Cloud and other
 versions need separate validation; verification of this package is still pending.
 Public API access and Data Tables must be available in the selected instance.
 
-1. Create an n8n API key. Restrict it to the queue's Data Table operations where
-   your n8n edition supports the necessary scopes. Keep it inside encrypted n8n
-   credentials; never give this API key to 1C.
-2. Import [Create queue table](../examples/create-queue-table.json), set the URL
-   to your own n8n, choose your n8n API credential, and run it once. Copy the
-   returned table ID. The table schema is included in the workflow.
-3. Create an **LDO 1C Standalone Queue API** credential with your n8n URL, API key,
-   table ID, database ID, local profile ID, policy revision, and a separate random
-   queue token of at least 32 characters. The database ID is local; MSRV enrollment
-   is not required.
-4. Add **LDO 1C Queue Gateway Trigger** to a separate workflow, select that
-   credential, and publish the workflow. Use its production webhook URL.
-5. In the compatible extension's n8n settings, configure the permitted objects,
-   fields, print forms and operations. Enter the gateway URL and queue token in
-   the webhook fields, then choose **Connect your own n8n queue**. Copy the displayed
-   database/profile/policy identifiers into the n8n credential. Configure the
-   extension's existing command polling schedule.
-6. Add **LDO 1C** to your business workflow with **Standalone Queue** and the same
-   credential. Run **Get Capabilities** once while the 1C poller is running.
-   Subsequent dropdowns use the retained result for that profile and revision.
+1. Create an n8n API key that can read/write Data Tables and create/activate
+   workflows. Keep this key in encrypted n8n credentials; never give it to 1C.
+2. Save an **LDO 1C Standalone Queue API** credential with your own n8n URL and
+   API key. Set Minimum Wait to match the database polling schedule.
+3. In **LDO 1C → Connection → Create Connection**, select that credential and
+   give the connection a name. The node creates the table and activates a
+   separate Queue Gateway workflow through the public n8n API.
+4. Copy the returned pairing code. In 1C, choose the permitted objects, fields,
+   print forms and operations, paste the code and choose **Подключить очередь
+   по коду** (Connect queue using code). Only a 1C administrator can pair it.
+   The code expires after 15 minutes. An exact retry recovers a lost response;
+   the same code cannot bind another database or profile.
+5. In business workflows, choose **Standalone Queue**, the saved credential,
+   and the new **Connection** from the list. Database/profile/policy identifiers
+   are discovered automatically. Configure the extension's polling schedule.
 
-Use HTTPS for production. The gateway must be reachable from the database's
-network. Its credential's n8n URL must also be reachable from the process handling
-webhooks; a container's `localhost` refers to that container.
+Use HTTPS for production. The production gateway URL must be reachable from
+1C. If it differs from the credential's API URL, enter **Public n8n URL** when
+creating the connection. A container's `localhost` refers to that container.
 
-When the local policy revision changes, update both action and gateway credentials.
-The same encrypted credential can be shared by these nodes. The extension includes
-its database/profile/revision in requests so a stale gateway configuration fails
-rather than silently accepting data under an old revision.
+The extension generates its own persistent exchange key during pairing. The
+n8n API key stays in n8n; the gateway stores only secret hashes in its connection
+record. Pairing requests are handled directly without workflow executions.
+Treat the pairing-code output as a secret and configure its workflow's execution
+retention accordingly.
+
+**Connection → Get Status**, **Renew Pairing Code**, and **Disconnect** manage
+this connection. Disconnect before pairing a different database. If initial
+workflow setup fails, the incomplete connection is unavailable; correct API
+permissions and create a new connection. Its retained artifacts can be inspected
+and removed through the usual n8n UI.
+
+The native poller synchronizes changes to the local policy before fetching
+commands. Credentials do not need manual revision updates. Commands still carry
+the policy under which they were created: pending commands from an older policy
+fail explicitly, while leased results and retained results remain available
+within their original database/profile scope. No automatic write replay occurs.
 
 ### Waiting and recovery
 
@@ -114,17 +125,21 @@ your retention policy.
 
 ## Direct HTTP
 
-1. Configure the same local permissions and choose **Enable direct HTTP exchange**
-   in the compatible extension. Save its profile ID, policy revision and profile
-   token. A new token is shown only when issued.
+1. Configure local permissions and choose **Enable direct HTTP exchange** in
+   the compatible extension. This explicitly enables the current native user's
+   access profile; merely knowing a 1C password does not enable the API.
 2. Publish the extension's `ldo_n8n` HTTP service and make it reachable from n8n,
-   either on your LAN/VPN or over HTTPS.
-3. Create **LDO 1C Direct API** with the service URL, native 1C username/password,
-   profile token, profile ID and policy revision. The profile belongs to the
-   selected native user. Credential testing performs a read-only capabilities
-   command directly against that database.
-4. Choose **Direct HTTP** in the action node. Commands and PDFs return in the HTTP
-   response. There is no Relay polling or automatic transport fallback.
+   on your LAN/VPN or over HTTPS.
+3. Create **LDO 1C Direct API** using only the service URL, native 1C username
+   and password. Credential testing performs read-only `GET /connection`.
+   Profile ID, Policy Revision and Profile Token are not entered.
+4. Choose **Direct HTTP** in the action node. The node discovers the native
+   user's active profile before each command. 1C rechecks its policy, grants,
+   object revision and native permissions when executing the command.
+
+There is no separate profile token. A missing, disabled, foreign or ambiguous
+profile is rejected. A policy change between discovery and execution rejects
+the command instead of retrying a write with new permissions.
 
 Direct events use the extension's separately configured outgoing webhook
 subscription. The Event and Delivery queue resources are unavailable in direct
@@ -140,4 +155,4 @@ never switches to MSRV.
 The native extension's standalone setup disconnects MSRV services. A customer
 administrator can explicitly connect those services later, without changing the
 standalone command transport. Server-side MSRV authorization remains required;
-a local profile token or an n8n API key grants no access to MSRV resources.
+a local profile or an n8n API key grants no access to MSRV resources.

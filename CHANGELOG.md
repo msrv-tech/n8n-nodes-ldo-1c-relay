@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3.0 — 2026-10-14
+
+- Simplify direct credentials to 1C service URL, username and password; discover
+  the explicitly enabled native access profile through read-only `/connection`.
+- Remove the separate profile token and manual standalone scope/revision fields.
+- Add Connection operations that create a durable queue table and activate its
+  gateway through the public n8n API, then return a 15-minute pairing code.
+- Generate the permanent exchange key in 1C; store only hashes in the gateway.
+  Enforce one-time binding with atomic comparison and recover exact retries.
+- Synchronize native policy revisions automatically; reject stale policy updates
+  and pending commands, while accepting leased results and retaining old results.
+- Add connection status, disconnect and renewed pairing for another database.
+- Breaking standalone setup change: recreate demo connections using this wizard.
+  Matching extension release is required (UNF 6.7.1.0).
+
 ## 0.2.0 — 2026-10-13
 
 - Add version 2 with standalone queue as the default and explicit direct/MSRV modes.

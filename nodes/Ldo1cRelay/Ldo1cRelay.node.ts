@@ -12,7 +12,14 @@ import {
 	type INodePropertyOptions,
 } from 'n8n-workflow';
 import type { Capabilities, RelayEvent, ReferenceValue } from './types';
-import { connectionMode, directCommand } from './connection';
+import { connectionMode, directCommand, directConnection } from './connection';
+import {
+	createQueueConnection,
+	listQueueConnections,
+	queueConnectionStatus,
+	renewQueuePairing,
+	disconnectQueue,
+} from './pairing';
 import {
 	enqueueCommand,
 	waitCommand,
@@ -215,6 +222,9 @@ async function standalonePdf(
 export class Ldo1cRelay implements INodeType {
 	methods: NonNullable<INodeType['methods']> = {
 		loadOptions: {
+			async getConnections(this: ILoadOptionsFunctions) {
+				return await listQueueConnections(this);
+			},
 			async getDocumentTypes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const capabilities = await catalogue(this);
 				return (capabilities.object_types || [])
@@ -376,6 +386,80 @@ export class Ldo1cRelay implements INodeType {
 		outputs: [NodeConnectionTypes.Main],
 		properties: [
 			{
+				displayName: 'Connection Name or ID',
+				name: 'connectionId',
+				type: 'options',
+				noDataExpression: true,
+				default: '',
+				required: true,
+				typeOptions: { loadOptionsMethod: 'getConnections' },
+				description:
+					'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+				displayOptions: { show: { connectionMode: ['queue'] }, hide: { resource: ['connection'] } },
+			},
+			{
+				displayName: 'Connection Name or ID',
+				name: 'connectionId',
+				type: 'options',
+				noDataExpression: true,
+				default: '',
+				required: true,
+				typeOptions: { loadOptionsMethod: 'getConnections' },
+				description:
+					'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+				displayOptions: {
+					show: { connectionMode: ['queue'], resource: ['connection'] },
+					hide: { operation: ['createConnection'] },
+				},
+			},
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				noDataExpression: true,
+				default: 'createConnection',
+				options: [
+					{
+						name: 'Create Connection',
+						value: 'createConnection',
+						action: 'Create a queue connection and pairing code',
+					},
+					{
+						name: 'Disconnect',
+						value: 'disconnectConnection',
+						action: 'Disconnect a queue connection',
+					},
+					{
+						name: 'Get Status',
+						value: 'connectionStatus',
+						action: 'Get a queue connection status',
+					},
+					{
+						name: 'Renew Pairing Code',
+						value: 'renewPairing',
+						action: 'Renew an unused or disconnected pairing code',
+					},
+				],
+				displayOptions: { show: { connectionMode: ['queue'], resource: ['connection'] } },
+			},
+			{
+				displayName: 'Connection Name',
+				name: 'connectionName',
+				type: 'string',
+				default: '1C',
+				required: true,
+				displayOptions: { show: { resource: ['connection'], operation: ['createConnection'] } },
+			},
+			{
+				displayName: 'Public N8n URL',
+				name: 'publicN8nUrl',
+				type: 'string',
+				default: '',
+				description:
+					'Optional public n8n URL if it differs from the API URL. This address must be reachable by 1C.',
+				displayOptions: { show: { resource: ['connection'], operation: ['createConnection'] } },
+			},
+			{
 				displayName: 'Wait for Result',
 				name: 'waitForResult',
 				type: 'boolean',
@@ -487,8 +571,13 @@ export class Ldo1cRelay implements INodeType {
 				required: true,
 				options: [
 					{ name: '1C Operation', value: 'operation' },
-					{ name: 'Event', value: 'events' },
+					{
+						name: 'Connection',
+						value: 'connection',
+						displayOptions: { show: { connectionMode: ['queue'] } },
+					},
 					{ name: 'Delivery', value: 'finalize' },
+					{ name: 'Event', value: 'events' },
 					{
 						name: 'Queue',
 						value: 'queue',
@@ -1261,8 +1350,13 @@ export class Ldo1cRelay implements INodeType {
 		}
 		const mode = connectionMode(this);
 		if (mode !== 'msrv') {
+			if (operation === 'capabilities')
+				return {
+					json: { ...(await relayCapabilities(this)).capabilities },
+					pairedItem: { item: index },
+				};
 			if (operation === 'documentFilePrepare' && mode === 'direct') {
-				const capabilities = (await directCommand(this, 'capabilities.get', {})).data;
+				const capabilities = (await directConnection(this)).capabilities;
 				if (capabilities.standalone_file_transfer !== true)
 					throw new UserError('This extension does not support standalone PDF transfer');
 			}
@@ -1447,7 +1541,24 @@ export class Ldo1cRelay implements INodeType {
 				// n8n invokes execute with its execution context, not the node instance.
 				// Keep the action implementations on the class for testability, but call
 				// them explicitly with that context rather than reading instance methods.
-				if (action === 'queue') output.push(await Ldo1cRelay.prototype.queue.call(this, index));
+				if (action === 'connection') {
+					if (connectionMode(this) !== 'queue' || this.getNode().type.endsWith('Tool'))
+						throw new UserError('Manage queue connections in a regular queue workflow');
+					const operation = String(this.getNodeParameter('operation', index));
+					let data: IDataObject;
+					if (operation === 'createConnection')
+						data = await createQueueConnection(
+							this,
+							String(this.getNodeParameter('connectionName', index)),
+							String(this.getNodeParameter('publicN8nUrl', index, '')),
+						);
+					else if (operation === 'connectionStatus') data = await queueConnectionStatus(this);
+					else if (operation === 'renewPairing') data = await renewQueuePairing(this);
+					else if (operation === 'disconnectConnection') data = await disconnectQueue(this);
+					else throw new UserError('Select a queue connection operation');
+					output.push({ json: data, pairedItem: { item: index } });
+				} else if (action === 'queue')
+					output.push(await Ldo1cRelay.prototype.queue.call(this, index));
 				else if (action === 'events')
 					output.push(...(await Ldo1cRelay.prototype.events.call(this, index)));
 				else if (action === 'finalize')

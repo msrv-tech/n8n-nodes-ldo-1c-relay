@@ -9,6 +9,9 @@ import {
 	type IWebhookFunctions,
 } from 'n8n-workflow';
 import { connectionUrl, requiredCredential } from './connection';
+import { connectionRecord } from './pairing';
+import { queueColumns } from './queue-schema';
+export { queueColumns } from './queue-schema';
 
 export type QueueContext =
 	| IExecuteFunctions
@@ -30,21 +33,18 @@ export interface QueueRow extends IDataObject {
 	result: string;
 }
 
-export const queueColumns = [
-	...[
-		'database_id',
-		'profile_id',
-		'policy_revision',
-		'kind',
-		'command_id',
-		'command_type',
-		'payload',
-		'status',
-		'lease_token',
-		'result',
-	].map((name) => ({ name, type: 'string' })),
-	...['lease_until', 'attempt_count', 'ready_at'].map((name) => ({ name, type: 'number' })),
-];
+export interface QueueConfiguration {
+	apiUrl: string;
+	tableId: string;
+	databaseId: string;
+	profileId: string;
+	policyRevision: string;
+	minimumWaitSeconds: number;
+}
+const operationConfigurations = new WeakMap<object, QueueConfiguration>();
+export function pinQueueConfiguration(context: QueueContext, config: QueueConfiguration) {
+	operationConfigurations.set(context, config);
+}
 
 const commandTypes = new Set([
 	'capabilities.get',
@@ -63,28 +63,23 @@ const commandTypes = new Set([
 const eventTypes = new Set(['approval.started', 'document.approved', 'document.rejected']);
 
 export async function queueConfiguration(context: QueueContext) {
+	const pinned = operationConfigurations.get(context);
+	if (pinned) return pinned;
 	const credentials = await context.getCredentials('ldo1cQueueApi');
-	for (const field of [
-		'apiUrl',
-		'apiToken',
-		'tableId',
-		'databaseId',
-		'profileId',
-		'policyRevision',
-		'queueToken',
-	])
-		requiredCredential(credentials, field);
-	if (String(credentials.queueToken).length < 32)
-		throw new UserError('Use a queue token with at least 32 random characters');
-	return {
+	for (const field of ['apiUrl', 'apiToken']) requiredCredential(credentials, field);
+	const saved = await connectionRecord(context);
+	if (saved.row.status !== 'paired')
+		throw new UserError('Pair this queue connection with 1C first');
+	const config = {
 		apiUrl: connectionUrl(credentials.apiUrl, true),
-		tableId: String(credentials.tableId),
-		databaseId: String(credentials.databaseId),
-		profileId: String(credentials.profileId),
-		policyRevision: String(credentials.policyRevision),
-		queueToken: String(credentials.queueToken),
+		tableId: saved.tableId,
+		databaseId: String(saved.row.database_id),
+		profileId: String(saved.row.profile_id),
+		policyRevision: String(saved.row.policy_revision),
 		minimumWaitSeconds: Number(credentials.minimumWaitSeconds ?? 900),
 	};
+	pinQueueConfiguration(context, config);
+	return config;
 }
 
 async function tableRequest<T>(
@@ -276,10 +271,22 @@ export async function commandResult(
 	context: QueueContext,
 	commandId: string,
 ): Promise<IDataObject> {
-	const rows = await queueRows(context, [
-		{ columnName: 'kind', condition: 'eq', value: 'command' },
-		{ columnName: 'command_id', condition: 'eq', value: commandId },
-	]);
+	const config = await queueConfiguration(context);
+	const lookup = await tableRequest<{ data: QueueRow[] }>(context, 'GET', '/rows', undefined, {
+		filter: JSON.stringify({
+			type: 'and',
+			filters: [
+				{ columnName: 'database_id', condition: 'eq', value: config.databaseId },
+				{ columnName: 'profile_id', condition: 'eq', value: config.profileId },
+				{ columnName: 'kind', condition: 'eq', value: 'command' },
+				{ columnName: 'command_id', condition: 'eq', value: commandId },
+			],
+		}),
+		limit: 100,
+		sortBy: 'id:asc',
+	});
+	if (!Array.isArray(lookup?.data)) throw new UserError('Invalid stored command response');
+	const rows = lookup.data;
 	if (!rows.length) throw new UserError('The command is not present in this queue profile');
 	const row = rows.find((item) => item.status === 'completed') || rows[0];
 	if (row.status !== 'completed') return { command_id: commandId, status: row.status };
@@ -316,20 +323,10 @@ export async function cleanupQueue(context: QueueContext, retentionDays: number)
 }
 
 export async function queueCapabilities(context: QueueContext) {
-	const rows = await queueRows(
-		context,
-		[
-			{ columnName: 'kind', condition: 'eq', value: 'command' },
-			{ columnName: 'command_type', condition: 'eq', value: 'capabilities.get' },
-			{ columnName: 'status', condition: 'eq', value: 'completed' },
-		],
-		'id:desc',
-	);
-	for (const row of rows) {
-		const result = JSON.parse(row.result) as IDataObject;
-		if (result.status === 'succeeded' && result.data) return result.data;
-	}
-	throw new UserError('Run Get Capabilities once while the 1C queue poller is active');
+	const saved = await connectionRecord(context);
+	if (saved.row.status !== 'paired')
+		throw new UserError('Pair this connection with 1C to load its available operations');
+	return saved.manifest.capabilities;
 }
 
 export async function leaseRows(
@@ -414,12 +411,23 @@ export async function finishEvent(
 export async function queueRpc(context: QueueContext, body: IDataObject): Promise<IDataObject> {
 	if (body.contract_version !== '1.0') throw new UserError('Unsupported queue contract');
 	const config = await queueConfiguration(context);
-	for (const [key, expected] of [['database_id', config.databaseId], ['profile_id', config.profileId], ['policy_revision', config.policyRevision]]) {
-		if (body[key] !== undefined && body[key] !== expected) throw new UserError('The 1C queue settings do not match this gateway profile');
+	for (const [key, expected] of [
+		['database_id', config.databaseId],
+		['profile_id', config.profileId],
+		['policy_revision', config.policyRevision],
+	]) {
+		if (body[key] !== undefined && body[key] !== expected)
+			throw new UserError('The 1C queue settings do not match this gateway profile');
 	}
 	if (body.action === 'ping') {
 		await validateQueueTable(context);
-		return { status: 'ok', contract_version: '1.0', database_id: config.databaseId, profile_id: config.profileId, policy_revision: config.policyRevision };
+		return {
+			status: 'ok',
+			contract_version: '1.0',
+			database_id: config.databaseId,
+			profile_id: config.profileId,
+			policy_revision: config.policyRevision,
+		};
 	}
 	if (body.action === 'poll') {
 		const rows = await leaseRows(context, 'command');
