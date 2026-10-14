@@ -1,7 +1,7 @@
 # Standalone 1C connections
 
-This guide describes the prepared 0.3.0 source and matching UNF 6.7.1.0
-extension. npm 0.2.0 does not include the simple credentials or pairing wizard.
+This guide describes version 0.3.0 and the matching UNF 6.7.1.0 extension.
+Version 0.2.0 does not include the simple credentials or pairing wizard.
 
 Node version 2 defaults to **Standalone Queue**. It never supplies an MSRV URL,
 activation key, subscription check, or Relay fallback. Your n8n and compatible
