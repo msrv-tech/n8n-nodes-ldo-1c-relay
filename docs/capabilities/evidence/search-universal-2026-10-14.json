@@ -1,0 +1,740 @@
+{
+  "schemaVersion": 1,
+  "packageVersion": "0.4.0-unreleased-build",
+  "method": "Real n8n node workflows via Public API and authenticated webhooks; server fixtures/assertions via registered 1C bridge",
+  "initialApprovalCapture": {
+    "captureEnabled": false,
+    "epochPresent": false,
+    "installedExtensions": [
+      {
+        "name": "CodexTestBridge",
+        "version": "0.8.1"
+      },
+      {
+        "name": "ЛегкийДокументооборотДляУНФ",
+        "version": "6.8.1.0"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "prepare-and-pair",
+      "status": "passed",
+      "coverage": [
+        "create-connection",
+        "queue-gateway",
+        "extension-distribution"
+      ],
+      "detail": "",
+      "seconds": 0
+    },
+    {
+      "id": "ordinary-event-onboarding",
+      "status": "passed",
+      "coverage": [
+        "extension-distribution"
+      ],
+      "detail": "Native pairing enabled approval capture and its epoch without additional bridge configuration",
+      "seconds": 0
+    },
+    {
+      "id": "queue/capabilities",
+      "status": "passed",
+      "coverage": [
+        "get-capabilities",
+        "dynamic-policy"
+      ],
+      "detail": "",
+      "seconds": 2.22
+    },
+    {
+      "id": "queue/document-read",
+      "status": "passed",
+      "coverage": [
+        "get-document-fields"
+      ],
+      "detail": "",
+      "seconds": 2.66
+    },
+    {
+      "id": "queue/document-write",
+      "status": "passed",
+      "coverage": [
+        "update-document-fields"
+      ],
+      "detail": "",
+      "seconds": 5.97
+    },
+    {
+      "id": "queue/catalog-read",
+      "status": "passed",
+      "coverage": [
+        "get-catalog-fields"
+      ],
+      "detail": "",
+      "seconds": 2.43
+    },
+    {
+      "id": "queue/catalog-write",
+      "status": "passed",
+      "coverage": [
+        "update-catalog-fields"
+      ],
+      "detail": "",
+      "seconds": 7.8
+    },
+    {
+      "id": "queue/reference-search",
+      "status": "passed",
+      "coverage": [
+        "search-reference-values"
+      ],
+      "detail": "",
+      "seconds": 2.43
+    },
+    {
+      "id": "queue/reference-write-three-modes",
+      "status": "passed",
+      "coverage": [
+        "update-reference-field"
+      ],
+      "detail": "",
+      "seconds": 23.83
+    },
+    {
+      "id": "queue/process-lifecycle",
+      "status": "passed",
+      "coverage": [
+        "start-external-process",
+        "get-external-process",
+        "transition-external-process",
+        "update-external-process-fields",
+        "cancel-external-process"
+      ],
+      "detail": "",
+      "seconds": 12.37
+    },
+    {
+      "id": "queue/event-document-ack",
+      "status": "passed",
+      "coverage": [
+        "lease-events",
+        "retry-event",
+        "acknowledge-event"
+      ],
+      "detail": "",
+      "seconds": 11.86
+    },
+    {
+      "id": "queue/pdf",
+      "status": "passed",
+      "coverage": [
+        "prepare-document-pdf"
+      ],
+      "detail": "",
+      "seconds": 7.75
+    },
+    {
+      "id": "queue/wait-result",
+      "status": "passed",
+      "coverage": [
+        "get-queue-result",
+        "wait-recovery"
+      ],
+      "detail": "",
+      "seconds": 3.89
+    },
+    {
+      "id": "queue/receipts",
+      "status": "passed",
+      "coverage": [
+        "write-receipts"
+      ],
+      "detail": "",
+      "seconds": 18.29
+    },
+    {
+      "id": "queue/cleanup",
+      "status": "passed",
+      "coverage": [
+        "clean-completed-entries"
+      ],
+      "detail": "",
+      "seconds": 5.46
+    },
+    {
+      "id": "queue/connection-lifecycle",
+      "status": "passed",
+      "coverage": [
+        "create-connection",
+        "connection-status",
+        "renew-pairing",
+        "disconnect-connection",
+        "queue-gateway"
+      ],
+      "detail": "",
+      "seconds": 2.41
+    },
+    {
+      "id": "queue/access-isolation",
+      "status": "passed",
+      "coverage": [
+        "dynamic-policy"
+      ],
+      "detail": "",
+      "seconds": 2.98
+    },
+    {
+      "id": "queue/ai-tool",
+      "status": "passed",
+      "coverage": [
+        "ai-tool"
+      ],
+      "detail": "",
+      "seconds": 97.07
+    },
+    {
+      "id": "queue/document-search",
+      "status": "passed",
+      "coverage": [
+        "search-documents"
+      ],
+      "detail": "",
+      "seconds": 35.12
+    },
+    {
+      "id": "queue/catalog-search",
+      "status": "passed",
+      "coverage": [
+        "search-catalog-items"
+      ],
+      "detail": "",
+      "seconds": 28.03
+    },
+    {
+      "id": "direct/capabilities",
+      "status": "passed",
+      "coverage": [
+        "get-capabilities",
+        "dynamic-policy"
+      ],
+      "detail": "",
+      "seconds": 1.68
+    },
+    {
+      "id": "direct/document-read",
+      "status": "passed",
+      "coverage": [
+        "get-document-fields"
+      ],
+      "detail": "",
+      "seconds": 1.65
+    },
+    {
+      "id": "direct/document-write",
+      "status": "passed",
+      "coverage": [
+        "update-document-fields"
+      ],
+      "detail": "",
+      "seconds": 3.77
+    },
+    {
+      "id": "direct/catalog-read",
+      "status": "passed",
+      "coverage": [
+        "get-catalog-fields"
+      ],
+      "detail": "",
+      "seconds": 1.61
+    },
+    {
+      "id": "direct/catalog-write",
+      "status": "passed",
+      "coverage": [
+        "update-catalog-fields"
+      ],
+      "detail": "",
+      "seconds": 3.27
+    },
+    {
+      "id": "direct/reference-search",
+      "status": "passed",
+      "coverage": [
+        "search-reference-values"
+      ],
+      "detail": "",
+      "seconds": 1.61
+    },
+    {
+      "id": "direct/reference-write-three-modes",
+      "status": "passed",
+      "coverage": [
+        "update-reference-field"
+      ],
+      "detail": "",
+      "seconds": 11.78
+    },
+    {
+      "id": "direct/process-lifecycle",
+      "status": "passed",
+      "coverage": [
+        "start-external-process",
+        "get-external-process",
+        "transition-external-process",
+        "update-external-process-fields",
+        "cancel-external-process"
+      ],
+      "detail": "",
+      "seconds": 8.22
+    },
+    {
+      "id": "direct/event-document-ack",
+      "status": "not-applicable",
+      "coverage": [
+        "lease-events",
+        "retry-event",
+        "acknowledge-event"
+      ],
+      "detail": "Direct events use outgoing webhook; queue resource intentionally unavailable",
+      "seconds": 0.0
+    },
+    {
+      "id": "direct/pdf",
+      "status": "passed",
+      "coverage": [
+        "prepare-document-pdf"
+      ],
+      "detail": "",
+      "seconds": 5.16
+    },
+    {
+      "id": "direct/wait-result",
+      "status": "not-applicable",
+      "coverage": [
+        "get-queue-result",
+        "wait-recovery"
+      ],
+      "detail": "Retained result API is standalone queue only",
+      "seconds": 0.0
+    },
+    {
+      "id": "direct/receipts",
+      "status": "passed",
+      "coverage": [
+        "write-receipts"
+      ],
+      "detail": "",
+      "seconds": 4.94
+    },
+    {
+      "id": "direct/cleanup",
+      "status": "not-applicable",
+      "coverage": [
+        "clean-completed-entries"
+      ],
+      "detail": "Queue cleanup is standalone only",
+      "seconds": 0.0
+    },
+    {
+      "id": "direct/connection-lifecycle",
+      "status": "not-applicable",
+      "coverage": [
+        "create-connection",
+        "connection-status",
+        "renew-pairing",
+        "disconnect-connection",
+        "queue-gateway"
+      ],
+      "detail": "Connection actions are standalone only",
+      "seconds": 0.0
+    },
+    {
+      "id": "direct/access-isolation",
+      "status": "passed",
+      "coverage": [
+        "dynamic-policy"
+      ],
+      "detail": "",
+      "seconds": 1.65
+    },
+    {
+      "id": "direct/ai-tool",
+      "status": "passed",
+      "coverage": [
+        "ai-tool"
+      ],
+      "detail": "",
+      "seconds": 77.24
+    },
+    {
+      "id": "direct/document-search",
+      "status": "passed",
+      "coverage": [
+        "search-documents"
+      ],
+      "detail": "",
+      "seconds": 22.05
+    },
+    {
+      "id": "direct/catalog-search",
+      "status": "passed",
+      "coverage": [
+        "search-catalog-items"
+      ],
+      "detail": "",
+      "seconds": 18.39
+    },
+    {
+      "id": "msrv-pdf-confirm",
+      "status": "not-run",
+      "coverage": [
+        "confirm-pdf-delivery"
+      ],
+      "detail": "Requires isolated enrolled MSRV fixture; existing contract tests cover this action, no MSRV enrollment is provisioned by this suite",
+      "seconds": 0
+    }
+  ],
+  "cleanup": "passed",
+  "pairedApprovalCapture": {
+    "captureEnabled": true,
+    "epochPresent": true,
+    "installedExtensions": [
+      {
+        "name": "CodexTestBridge",
+        "version": "0.8.1"
+      },
+      {
+        "name": "ЛегкийДокументооборотДляУНФ",
+        "version": "6.8.1.0"
+      }
+    ]
+  },
+  "unmapped": [],
+  "durationSeconds": 446.67,
+  "overall": "passed-with-explicit-gaps",
+  "capabilities": {
+    "acknowledge-event": [
+      {
+        "case": "queue/event-document-ack",
+        "status": "passed"
+      },
+      {
+        "case": "direct/event-document-ack",
+        "status": "not-applicable"
+      }
+    ],
+    "ai-tool": [
+      {
+        "case": "queue/ai-tool",
+        "status": "passed"
+      },
+      {
+        "case": "direct/ai-tool",
+        "status": "passed"
+      }
+    ],
+    "cancel-external-process": [
+      {
+        "case": "queue/process-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/process-lifecycle",
+        "status": "passed"
+      }
+    ],
+    "clean-completed-entries": [
+      {
+        "case": "queue/cleanup",
+        "status": "passed"
+      },
+      {
+        "case": "direct/cleanup",
+        "status": "not-applicable"
+      }
+    ],
+    "confirm-pdf-delivery": [
+      {
+        "case": "msrv-pdf-confirm",
+        "status": "not-run"
+      }
+    ],
+    "connection-status": [
+      {
+        "case": "queue/connection-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/connection-lifecycle",
+        "status": "not-applicable"
+      }
+    ],
+    "create-connection": [
+      {
+        "case": "prepare-and-pair",
+        "status": "passed"
+      },
+      {
+        "case": "queue/connection-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/connection-lifecycle",
+        "status": "not-applicable"
+      }
+    ],
+    "disconnect-connection": [
+      {
+        "case": "queue/connection-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/connection-lifecycle",
+        "status": "not-applicable"
+      }
+    ],
+    "dynamic-policy": [
+      {
+        "case": "queue/capabilities",
+        "status": "passed"
+      },
+      {
+        "case": "queue/access-isolation",
+        "status": "passed"
+      },
+      {
+        "case": "direct/capabilities",
+        "status": "passed"
+      },
+      {
+        "case": "direct/access-isolation",
+        "status": "passed"
+      }
+    ],
+    "extension-distribution": [
+      {
+        "case": "prepare-and-pair",
+        "status": "passed"
+      },
+      {
+        "case": "ordinary-event-onboarding",
+        "status": "passed"
+      }
+    ],
+    "get-capabilities": [
+      {
+        "case": "queue/capabilities",
+        "status": "passed"
+      },
+      {
+        "case": "direct/capabilities",
+        "status": "passed"
+      }
+    ],
+    "get-catalog-fields": [
+      {
+        "case": "queue/catalog-read",
+        "status": "passed"
+      },
+      {
+        "case": "direct/catalog-read",
+        "status": "passed"
+      }
+    ],
+    "get-document-fields": [
+      {
+        "case": "queue/document-read",
+        "status": "passed"
+      },
+      {
+        "case": "direct/document-read",
+        "status": "passed"
+      }
+    ],
+    "get-external-process": [
+      {
+        "case": "queue/process-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/process-lifecycle",
+        "status": "passed"
+      }
+    ],
+    "get-queue-result": [
+      {
+        "case": "queue/wait-result",
+        "status": "passed"
+      },
+      {
+        "case": "direct/wait-result",
+        "status": "not-applicable"
+      }
+    ],
+    "lease-events": [
+      {
+        "case": "queue/event-document-ack",
+        "status": "passed"
+      },
+      {
+        "case": "direct/event-document-ack",
+        "status": "not-applicable"
+      }
+    ],
+    "prepare-document-pdf": [
+      {
+        "case": "queue/pdf",
+        "status": "passed"
+      },
+      {
+        "case": "direct/pdf",
+        "status": "passed"
+      }
+    ],
+    "queue-gateway": [
+      {
+        "case": "prepare-and-pair",
+        "status": "passed"
+      },
+      {
+        "case": "queue/connection-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/connection-lifecycle",
+        "status": "not-applicable"
+      }
+    ],
+    "renew-pairing": [
+      {
+        "case": "queue/connection-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/connection-lifecycle",
+        "status": "not-applicable"
+      }
+    ],
+    "retry-event": [
+      {
+        "case": "queue/event-document-ack",
+        "status": "passed"
+      },
+      {
+        "case": "direct/event-document-ack",
+        "status": "not-applicable"
+      }
+    ],
+    "search-catalog-items": [
+      {
+        "case": "queue/catalog-search",
+        "status": "passed"
+      },
+      {
+        "case": "direct/catalog-search",
+        "status": "passed"
+      }
+    ],
+    "search-documents": [
+      {
+        "case": "queue/document-search",
+        "status": "passed"
+      },
+      {
+        "case": "direct/document-search",
+        "status": "passed"
+      }
+    ],
+    "search-reference-values": [
+      {
+        "case": "queue/reference-search",
+        "status": "passed"
+      },
+      {
+        "case": "direct/reference-search",
+        "status": "passed"
+      }
+    ],
+    "start-external-process": [
+      {
+        "case": "queue/process-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/process-lifecycle",
+        "status": "passed"
+      }
+    ],
+    "transition-external-process": [
+      {
+        "case": "queue/process-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/process-lifecycle",
+        "status": "passed"
+      }
+    ],
+    "update-catalog-fields": [
+      {
+        "case": "queue/catalog-write",
+        "status": "passed"
+      },
+      {
+        "case": "direct/catalog-write",
+        "status": "passed"
+      }
+    ],
+    "update-document-fields": [
+      {
+        "case": "queue/document-write",
+        "status": "passed"
+      },
+      {
+        "case": "direct/document-write",
+        "status": "passed"
+      }
+    ],
+    "update-external-process-fields": [
+      {
+        "case": "queue/process-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/process-lifecycle",
+        "status": "passed"
+      }
+    ],
+    "update-reference-field": [
+      {
+        "case": "queue/reference-write-three-modes",
+        "status": "passed"
+      },
+      {
+        "case": "direct/reference-write-three-modes",
+        "status": "passed"
+      }
+    ],
+    "wait-recovery": [
+      {
+        "case": "queue/wait-result",
+        "status": "passed"
+      },
+      {
+        "case": "direct/wait-result",
+        "status": "not-applicable"
+      }
+    ],
+    "write-receipts": [
+      {
+        "case": "queue/receipts",
+        "status": "passed"
+      },
+      {
+        "case": "direct/receipts",
+        "status": "passed"
+      }
+    ]
+  }
+}

@@ -10,6 +10,16 @@ import {
 export type OperationContext = IExecuteFunctions | ILoadOptionsFunctions;
 export type ConnectionMode = 'queue' | 'direct' | 'msrv';
 
+export class CommandFailure extends UserError {
+	constructor(
+		message: string,
+		readonly commandId: string,
+		readonly errorCode: string,
+	) {
+		super(message);
+	}
+}
+
 export function connectionMode(context: OperationContext): ConnectionMode {
 	const node = context.getNode();
 	if ((node.typeVersion ?? 2) < 2) return 'msrv';
@@ -95,10 +105,12 @@ export async function directCommand(
 ) {
 	const config = await directConnection(context, timeoutSeconds);
 	const type = commandType.replace(/^n8n\./, '');
-	const result = (await context.helpers.httpRequestWithAuthentication.call(context, 'ldo1cApi', {
+	const response = (await context.helpers.httpRequestWithAuthentication.call(context, 'ldo1cApi', {
 		method: 'POST',
 		url: `${config.apiUrl}/commands`,
 		json: true,
+		returnFullResponse: true,
+		ignoreHttpStatusErrors: true,
 		disableFollowRedirect: true,
 		timeout: timeoutSeconds * 1000,
 		body: {
@@ -111,18 +123,28 @@ export async function directCommand(
 				policy_revision: config.policyRevision,
 			},
 		},
-	})) as IDataObject;
+	})) as { statusCode: number; body: IDataObject };
+	// The native service uses 403 for a normalized business refusal as well.
+	// Decode only correlated contract results; proxy/authentication errors remain errors.
+	if (![200, 403].includes(response.statusCode))
+		throw new UserError('1C rejected the HTTP command request');
+	const result = response.body;
 	if (
 		!result ||
 		result.contract_version !== '1.0' ||
 		result.command_id !== commandId ||
-		result.command_type !== type
+		result.command_type !== type ||
+		(response.statusCode !== 200 && result.status === 'succeeded')
 	)
 		throw new UserError('1C returned a result that does not match the requested command');
-	if (result.status !== 'succeeded')
-		throw new UserError(
+	if (result.status !== 'succeeded') {
+		const code = String((result.error as IDataObject)?.code || 'operation_failed');
+		throw new CommandFailure(
 			String((result.error as IDataObject)?.message || '1C rejected the operation'),
+			commandId,
+			/^[a-z][a-z0-9_]{0,63}$/.test(code) ? code : 'operation_failed',
 		);
+	}
 	if (!result.data || Array.isArray(result.data) || typeof result.data !== 'object')
 		throw new UserError('1C returned invalid operation data');
 	return { commandId, data: result.data as IDataObject };

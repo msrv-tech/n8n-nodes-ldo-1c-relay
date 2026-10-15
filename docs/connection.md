@@ -1,5 +1,7 @@
 # Connection and extension setup
 
+For the complete operation reference, transport matrix and validation evidence, see the [capabilities registry](capabilities/README.md).
+
 This page describes the managed Relay mode. For your own queue or direct HTTP without MSRV, see [Standalone connections](standalone.md).
 
 ## Prerequisites

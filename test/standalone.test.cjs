@@ -14,7 +14,7 @@ const direct = { apiUrl:'https://1c.customer.test/base/hs/ldo_n8n',username:'tes
 const queue = { apiUrl:'https://n8n.customer.test',apiToken:'synthetic-n8n-api-key',tableId:'queue-table',databaseId:randomUUID(),profileId:direct.profileId,policyRevision:direct.policyRevision,queueToken:'synthetic-queue-token-at-least-32-characters',minimumWaitSeconds:0 };
 function ctx(mode, params={}, handler=async()=>({})) {
  const calls=[];
- return { calls,getNode:()=>({name:'1C',type:'n8n-nodes-ldo-1c-relay.ldo1cRelay',typeVersion:2,parameters:{connectionMode:mode,connectionId:'queue-table'}}),getCredentials:async(type)=>{ assert.equal(type,mode==='direct'?'ldo1cApi':'ldo1cQueueApi'); return mode==='direct'?direct:queue; },getNodeParameter:(key,index,fallback)=>params[key]??fallback,getInputData:()=>[{json:{}}],continueOnFail:()=>false,helpers:{httpRequestWithAuthentication:async(type,request)=>{ assert.ok(!new URL(request.url).hostname.endsWith('msrv.tech'));calls.push(request);return mode==='direct' && request.method==='GET'?descriptor():handler(request,type); },prepareBinaryData:async(content,filename,mimeType)=>({data:content.toString('base64'),fileName:filename,mimeType})} };
+ return { calls,getNode:()=>({name:'1C',type:'n8n-nodes-ldo-1c-relay.ldo1cRelay',typeVersion:2,parameters:{connectionMode:mode,connectionId:'queue-table'}}),getCredentials:async(type)=>{ assert.equal(type,mode==='direct'?'ldo1cApi':'ldo1cQueueApi'); return mode==='direct'?direct:queue; },getNodeParameter:(key,index,fallback)=>params[key]??fallback,getInputData:()=>[{json:{}}],continueOnFail:()=>false,helpers:{httpRequestWithAuthentication:async(type,request)=>{ assert.ok(!new URL(request.url).hostname.endsWith('msrv.tech'));calls.push(request);const result=mode==='direct' && request.method==='GET'?descriptor():await handler(request,type);return request.returnFullResponse?{statusCode:result.status==='failed'?403:200,body:result}:result; },prepareBinaryData:async(content,filename,mimeType)=>({data:content.toString('base64'),fileName:filename,mimeType})} };
 }
 function memory() {
  const rows=[{id:1,database_id:queue.databaseId,profile_id:queue.profileId,policy_revision:queue.policyRevision,kind:'connection',status:'paired',payload:JSON.stringify({protocol:'ldo.queue.connection/1',name:'Demo',pairing_id:randomUUID(),token_hash:P.secretHash(queue.queueToken),capabilities:descriptor().capabilities,policy_serial:1})}];
@@ -23,7 +23,7 @@ function memory() {
   if(req.method==='GET' && !req.qs) return {columns:Q.queueColumns};
   if(req.method==='GET') return {data:rows.filter(r=>matches(r,JSON.parse(req.qs.filter))).map(r=>({...r}))};
   if(req.method==='POST') { const result=req.body.data.map(r=>({...r,id:rows.length+1}));rows.push(...result);return result.map(r=>({...r})); }
-  if(req.method==='DELETE') { const selected=rows.filter(r=>matches(r,JSON.parse(req.qs.filter)));for(const row of selected)rows.splice(rows.indexOf(row),1);return selected.map(r=>({...r})); }
+  if(req.method==='DELETE') { assert.ok(req.url.endsWith('/rows/delete'),'Use the public filtered-delete endpoint, not /rows'); const selected=rows.filter(r=>matches(r,JSON.parse(req.qs.filter)));for(const row of selected)rows.splice(rows.indexOf(row),1);return selected.map(r=>({...r})); }
   if(req.method==='PATCH') { const selected=rows.filter(r=>matches(r,req.body.filter));for(const row of selected)Object.assign(row,req.body.data);return selected.map(r=>({...r})); }
   throw new Error('Unexpected API operation');
  };
@@ -40,6 +40,19 @@ function memory() {
  assert.equal(c.calls.length,2);assert.equal(c.calls[0].url,direct.apiUrl+'/connection');assert.equal(c.calls[1].url,direct.apiUrl+'/commands');assert.equal(c.calls[1].body.payload.profile_id,direct.profileId);
  await assert.rejects(()=>directCommand(ctx('direct',{},async()=>({contract_version:'1.0',command_id:randomUUID(),command_type:'document.get',status:'succeeded',data:{}})),'document.get',{}));
  await assert.rejects(()=>directCommand(ctx('direct',{},async(req)=>({contract_version:'1.0',command_id:req.body.command_id,command_type:req.body.command_type,status:'failed',error:{message:'revision_conflict'}})),'document.get',{}),/revision_conflict/);
+ const refused=ctx('direct',{resource:'operation',operation:'documentGet',documentType:'document.Invoice',documentId:randomUUID(),fields:['number'],timeoutSeconds:1,pollSeconds:1},async(req)=>({contract_version:'1.0',command_id:req.body.command_id,command_type:req.body.command_type,status:'failed',error:{code:'revision_conflict',message:'1C rejected the operation'}}));
+ refused.continueOnFail=()=>true;
+ const failedOutput=(await Ldo1cRelay.prototype.execute.call(refused))[0][0].json;
+ assert.equal(failedOutput.error_code,'revision_conflict');
+ assert.equal(failedOutput._ldo.command_id,refused.calls.find(req=>req.method==='POST').body.command_id);
+ assert.equal(failedOutput.error,'1C rejected the operation');
+ assert.equal(refused.calls.find(req=>req.method==='POST').returnFullResponse,true);
+ assert.equal(refused.calls.find(req=>req.method==='POST').ignoreHttpStatusErrors,true);
+ const invalidHttp=ctx('direct');
+ invalidHttp.helpers.httpRequestWithAuthentication=async(type,req)=>req.method==='GET'?descriptor():({statusCode:403,body:{contract_version:'1.0',command_id:req.body.command_id,command_type:req.body.command_type,status:'succeeded',data:{}}});
+ await assert.rejects(()=>directCommand(invalidHttp,'document.get',{}),/does not match/);
+ invalidHttp.helpers.httpRequestWithAuthentication=async(type,req)=>req.method==='GET'?descriptor():({statusCode:403,body:{contract_version:'1.0',status:'failed',error:{code:'access_denied'}}});
+ await assert.rejects(()=>directCommand(invalidHttp,'document.get',{}),/does not match/);
  const pdf=ctx('direct',{resource:'operation',operation:'documentFilePrepare',timeoutSeconds:1,pollSeconds:1},async(req)=>({contract_version:'1.0',command_id:req.body.command_id,command_type:req.body.command_type,status:'succeeded',data:{}}));
  await assert.rejects(()=>Ldo1cRelay.prototype.execute.call(pdf),/standalone PDF/);assert.equal(pdf.calls.length,1);assert.equal(pdf.calls[0].method,'GET');
  for(const Credential of [Ldo1cApi,Ldo1cQueueApi]) { const credential=new Credential();const values=Credential===Ldo1cApi?direct:queue;await assert.rejects(()=>credential.authenticate({...values,apiUrl:'https://api.ldo.msrv.tech'},{}));assert.equal(credential.properties.find(p=>p.name==='apiUrl').default,''); }

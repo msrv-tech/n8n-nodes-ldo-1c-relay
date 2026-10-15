@@ -1,0 +1,684 @@
+{
+  "schemaVersion": 1,
+  "packageVersion": "0.3.1-unreleased-build",
+  "method": "Real n8n node workflows via Public API and authenticated webhooks; server fixtures/assertions via registered 1C bridge",
+  "initialApprovalCapture": {
+    "captureEnabled": false,
+    "epochPresent": false
+  },
+  "cases": [
+    {
+      "id": "prepare-and-pair",
+      "status": "passed",
+      "coverage": [
+        "create-connection",
+        "queue-gateway",
+        "extension-distribution"
+      ],
+      "detail": "",
+      "seconds": 0
+    },
+    {
+      "id": "ordinary-event-onboarding",
+      "status": "passed",
+      "coverage": [
+        "extension-distribution"
+      ],
+      "detail": "Native pairing enabled approval capture and its epoch without additional bridge configuration",
+      "seconds": 0
+    },
+    {
+      "id": "queue/capabilities",
+      "status": "passed",
+      "coverage": [
+        "get-capabilities",
+        "dynamic-policy"
+      ],
+      "detail": "",
+      "seconds": 1.84
+    },
+    {
+      "id": "queue/document-read",
+      "status": "passed",
+      "coverage": [
+        "get-document-fields"
+      ],
+      "detail": "",
+      "seconds": 4.66
+    },
+    {
+      "id": "queue/document-write",
+      "status": "passed",
+      "coverage": [
+        "update-document-fields"
+      ],
+      "detail": "",
+      "seconds": 7.67
+    },
+    {
+      "id": "queue/catalog-read",
+      "status": "passed",
+      "coverage": [
+        "get-catalog-fields"
+      ],
+      "detail": "",
+      "seconds": 4.3
+    },
+    {
+      "id": "queue/catalog-write",
+      "status": "passed",
+      "coverage": [
+        "update-catalog-fields"
+      ],
+      "detail": "",
+      "seconds": 6.51
+    },
+    {
+      "id": "queue/reference-search",
+      "status": "passed",
+      "coverage": [
+        "search-reference-values"
+      ],
+      "detail": "",
+      "seconds": 3.81
+    },
+    {
+      "id": "queue/reference-write-three-modes",
+      "status": "passed",
+      "coverage": [
+        "update-reference-field"
+      ],
+      "detail": "",
+      "seconds": 27.36
+    },
+    {
+      "id": "queue/process-lifecycle",
+      "status": "passed",
+      "coverage": [
+        "start-external-process",
+        "get-external-process",
+        "transition-external-process",
+        "update-external-process-fields",
+        "cancel-external-process"
+      ],
+      "detail": "",
+      "seconds": 18.32
+    },
+    {
+      "id": "queue/event-document-ack",
+      "status": "passed",
+      "coverage": [
+        "lease-events",
+        "retry-event",
+        "acknowledge-event"
+      ],
+      "detail": "",
+      "seconds": 11.54
+    },
+    {
+      "id": "queue/pdf",
+      "status": "passed",
+      "coverage": [
+        "prepare-document-pdf"
+      ],
+      "detail": "",
+      "seconds": 7.6
+    },
+    {
+      "id": "queue/wait-result",
+      "status": "passed",
+      "coverage": [
+        "get-queue-result",
+        "wait-recovery"
+      ],
+      "detail": "",
+      "seconds": 4.33
+    },
+    {
+      "id": "queue/receipts",
+      "status": "passed",
+      "coverage": [
+        "write-receipts"
+      ],
+      "detail": "",
+      "seconds": 19.08
+    },
+    {
+      "id": "queue/cleanup",
+      "status": "passed",
+      "coverage": [
+        "clean-completed-entries"
+      ],
+      "detail": "",
+      "seconds": 5.16
+    },
+    {
+      "id": "queue/connection-lifecycle",
+      "status": "passed",
+      "coverage": [
+        "create-connection",
+        "connection-status",
+        "renew-pairing",
+        "disconnect-connection",
+        "queue-gateway"
+      ],
+      "detail": "",
+      "seconds": 2.51
+    },
+    {
+      "id": "queue/access-isolation",
+      "status": "passed",
+      "coverage": [
+        "dynamic-policy"
+      ],
+      "detail": "",
+      "seconds": 3.51
+    },
+    {
+      "id": "queue/ai-tool",
+      "status": "passed",
+      "coverage": [
+        "ai-tool"
+      ],
+      "detail": "",
+      "seconds": 85.69
+    },
+    {
+      "id": "direct/capabilities",
+      "status": "passed",
+      "coverage": [
+        "get-capabilities",
+        "dynamic-policy"
+      ],
+      "detail": "",
+      "seconds": 1.13
+    },
+    {
+      "id": "direct/document-read",
+      "status": "passed",
+      "coverage": [
+        "get-document-fields"
+      ],
+      "detail": "",
+      "seconds": 1.16
+    },
+    {
+      "id": "direct/document-write",
+      "status": "passed",
+      "coverage": [
+        "update-document-fields"
+      ],
+      "detail": "",
+      "seconds": 3.26
+    },
+    {
+      "id": "direct/catalog-read",
+      "status": "passed",
+      "coverage": [
+        "get-catalog-fields"
+      ],
+      "detail": "",
+      "seconds": 1.11
+    },
+    {
+      "id": "direct/catalog-write",
+      "status": "passed",
+      "coverage": [
+        "update-catalog-fields"
+      ],
+      "detail": "",
+      "seconds": 2.27
+    },
+    {
+      "id": "direct/reference-search",
+      "status": "passed",
+      "coverage": [
+        "search-reference-values"
+      ],
+      "detail": "",
+      "seconds": 1.11
+    },
+    {
+      "id": "direct/reference-write-three-modes",
+      "status": "passed",
+      "coverage": [
+        "update-reference-field"
+      ],
+      "detail": "",
+      "seconds": 8.8
+    },
+    {
+      "id": "direct/process-lifecycle",
+      "status": "passed",
+      "coverage": [
+        "start-external-process",
+        "get-external-process",
+        "transition-external-process",
+        "update-external-process-fields",
+        "cancel-external-process"
+      ],
+      "detail": "",
+      "seconds": 5.71
+    },
+    {
+      "id": "direct/event-document-ack",
+      "status": "not-applicable",
+      "coverage": [
+        "lease-events",
+        "retry-event",
+        "acknowledge-event"
+      ],
+      "detail": "Direct events use outgoing webhook; queue resource intentionally unavailable",
+      "seconds": 0.0
+    },
+    {
+      "id": "direct/pdf",
+      "status": "passed",
+      "coverage": [
+        "prepare-document-pdf"
+      ],
+      "detail": "",
+      "seconds": 3.64
+    },
+    {
+      "id": "direct/wait-result",
+      "status": "not-applicable",
+      "coverage": [
+        "get-queue-result",
+        "wait-recovery"
+      ],
+      "detail": "Retained result API is standalone queue only",
+      "seconds": 0.0
+    },
+    {
+      "id": "direct/receipts",
+      "status": "passed",
+      "coverage": [
+        "write-receipts"
+      ],
+      "detail": "",
+      "seconds": 3.94
+    },
+    {
+      "id": "direct/cleanup",
+      "status": "not-applicable",
+      "coverage": [
+        "clean-completed-entries"
+      ],
+      "detail": "Queue cleanup is standalone only",
+      "seconds": 0.0
+    },
+    {
+      "id": "direct/connection-lifecycle",
+      "status": "not-applicable",
+      "coverage": [
+        "create-connection",
+        "connection-status",
+        "renew-pairing",
+        "disconnect-connection",
+        "queue-gateway"
+      ],
+      "detail": "Connection actions are standalone only",
+      "seconds": 0.0
+    },
+    {
+      "id": "direct/access-isolation",
+      "status": "passed",
+      "coverage": [
+        "dynamic-policy"
+      ],
+      "detail": "",
+      "seconds": 1.17
+    },
+    {
+      "id": "direct/ai-tool",
+      "status": "passed",
+      "coverage": [
+        "ai-tool"
+      ],
+      "detail": "",
+      "seconds": 72.78
+    },
+    {
+      "id": "msrv-pdf-confirm",
+      "status": "not-run",
+      "coverage": [
+        "confirm-pdf-delivery"
+      ],
+      "detail": "Requires isolated enrolled MSRV fixture; existing contract tests cover this action, no MSRV enrollment is provisioned by this suite",
+      "seconds": 0
+    }
+  ],
+  "cleanup": "passed",
+  "pairedApprovalCapture": {
+    "captureEnabled": true,
+    "epochPresent": true
+  },
+  "unmapped": [],
+  "durationSeconds": 329.26,
+  "overall": "passed-with-explicit-gaps",
+  "capabilities": {
+    "acknowledge-event": [
+      {
+        "case": "queue/event-document-ack",
+        "status": "passed"
+      },
+      {
+        "case": "direct/event-document-ack",
+        "status": "not-applicable"
+      }
+    ],
+    "ai-tool": [
+      {
+        "case": "queue/ai-tool",
+        "status": "passed"
+      },
+      {
+        "case": "direct/ai-tool",
+        "status": "passed"
+      }
+    ],
+    "cancel-external-process": [
+      {
+        "case": "queue/process-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/process-lifecycle",
+        "status": "passed"
+      }
+    ],
+    "clean-completed-entries": [
+      {
+        "case": "queue/cleanup",
+        "status": "passed"
+      },
+      {
+        "case": "direct/cleanup",
+        "status": "not-applicable"
+      }
+    ],
+    "confirm-pdf-delivery": [
+      {
+        "case": "msrv-pdf-confirm",
+        "status": "not-run"
+      }
+    ],
+    "connection-status": [
+      {
+        "case": "queue/connection-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/connection-lifecycle",
+        "status": "not-applicable"
+      }
+    ],
+    "create-connection": [
+      {
+        "case": "prepare-and-pair",
+        "status": "passed"
+      },
+      {
+        "case": "queue/connection-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/connection-lifecycle",
+        "status": "not-applicable"
+      }
+    ],
+    "disconnect-connection": [
+      {
+        "case": "queue/connection-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/connection-lifecycle",
+        "status": "not-applicable"
+      }
+    ],
+    "dynamic-policy": [
+      {
+        "case": "queue/capabilities",
+        "status": "passed"
+      },
+      {
+        "case": "queue/access-isolation",
+        "status": "passed"
+      },
+      {
+        "case": "direct/capabilities",
+        "status": "passed"
+      },
+      {
+        "case": "direct/access-isolation",
+        "status": "passed"
+      }
+    ],
+    "extension-distribution": [
+      {
+        "case": "prepare-and-pair",
+        "status": "passed"
+      },
+      {
+        "case": "ordinary-event-onboarding",
+        "status": "passed"
+      }
+    ],
+    "get-capabilities": [
+      {
+        "case": "queue/capabilities",
+        "status": "passed"
+      },
+      {
+        "case": "direct/capabilities",
+        "status": "passed"
+      }
+    ],
+    "get-catalog-fields": [
+      {
+        "case": "queue/catalog-read",
+        "status": "passed"
+      },
+      {
+        "case": "direct/catalog-read",
+        "status": "passed"
+      }
+    ],
+    "get-document-fields": [
+      {
+        "case": "queue/document-read",
+        "status": "passed"
+      },
+      {
+        "case": "direct/document-read",
+        "status": "passed"
+      }
+    ],
+    "get-external-process": [
+      {
+        "case": "queue/process-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/process-lifecycle",
+        "status": "passed"
+      }
+    ],
+    "get-queue-result": [
+      {
+        "case": "queue/wait-result",
+        "status": "passed"
+      },
+      {
+        "case": "direct/wait-result",
+        "status": "not-applicable"
+      }
+    ],
+    "lease-events": [
+      {
+        "case": "queue/event-document-ack",
+        "status": "passed"
+      },
+      {
+        "case": "direct/event-document-ack",
+        "status": "not-applicable"
+      }
+    ],
+    "prepare-document-pdf": [
+      {
+        "case": "queue/pdf",
+        "status": "passed"
+      },
+      {
+        "case": "direct/pdf",
+        "status": "passed"
+      }
+    ],
+    "queue-gateway": [
+      {
+        "case": "prepare-and-pair",
+        "status": "passed"
+      },
+      {
+        "case": "queue/connection-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/connection-lifecycle",
+        "status": "not-applicable"
+      }
+    ],
+    "renew-pairing": [
+      {
+        "case": "queue/connection-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/connection-lifecycle",
+        "status": "not-applicable"
+      }
+    ],
+    "retry-event": [
+      {
+        "case": "queue/event-document-ack",
+        "status": "passed"
+      },
+      {
+        "case": "direct/event-document-ack",
+        "status": "not-applicable"
+      }
+    ],
+    "search-reference-values": [
+      {
+        "case": "queue/reference-search",
+        "status": "passed"
+      },
+      {
+        "case": "direct/reference-search",
+        "status": "passed"
+      }
+    ],
+    "start-external-process": [
+      {
+        "case": "queue/process-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/process-lifecycle",
+        "status": "passed"
+      }
+    ],
+    "transition-external-process": [
+      {
+        "case": "queue/process-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/process-lifecycle",
+        "status": "passed"
+      }
+    ],
+    "update-catalog-fields": [
+      {
+        "case": "queue/catalog-write",
+        "status": "passed"
+      },
+      {
+        "case": "direct/catalog-write",
+        "status": "passed"
+      }
+    ],
+    "update-document-fields": [
+      {
+        "case": "queue/document-write",
+        "status": "passed"
+      },
+      {
+        "case": "direct/document-write",
+        "status": "passed"
+      }
+    ],
+    "update-external-process-fields": [
+      {
+        "case": "queue/process-lifecycle",
+        "status": "passed"
+      },
+      {
+        "case": "direct/process-lifecycle",
+        "status": "passed"
+      }
+    ],
+    "update-reference-field": [
+      {
+        "case": "queue/reference-write-three-modes",
+        "status": "passed"
+      },
+      {
+        "case": "direct/reference-write-three-modes",
+        "status": "passed"
+      }
+    ],
+    "wait-recovery": [
+      {
+        "case": "queue/wait-result",
+        "status": "passed"
+      },
+      {
+        "case": "direct/wait-result",
+        "status": "not-applicable"
+      }
+    ],
+    "write-receipts": [
+      {
+        "case": "queue/receipts",
+        "status": "passed"
+      },
+      {
+        "case": "direct/receipts",
+        "status": "passed"
+      }
+    ]
+  },
+  "verifiedEnvironment": {
+    "nodePackageVersion": "0.3.1",
+    "n8nVersion": "2.36.9",
+    "sha256": {
+      "Ldo1cRelay.node.js": "c92962da01d9f7a93a1f1614c9987ac1c60fc614374ed5dfee3c18b9986e4876",
+      "connection.js": "161ad3d6fdee9cc941e4a3e62ad7f2eb4cc084b17246785bb984b8a7f9f9cf60",
+      "queue.js": "321a477de42a0b8ee41fa34da1f237e450a7f54b880add49ef7b30c2d6499015"
+    },
+    "installedExtensions": [
+      {
+        "name": "CodexTestBridge",
+        "version": "0.8.1"
+      },
+      {
+        "name": "ЛегкийДокументооборотДляУНФ",
+        "version": "6.7.1.3"
+      }
+    ],
+    "buildStatus": "unreleased working build, installed only in isolated test n8n and registered UNF2"
+  }
+}

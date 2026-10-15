@@ -1,5 +1,7 @@
 # Verification submission details
 
+This page retains dated release and review records. For current actions, parameters and version-specific test coverage, use the [capabilities registry](capabilities/README.md). Earlier review instructions below apply to their named release and do not replace the current [standalone guide](standalone.md).
+
 ## Package identity
 
 - npm package: `n8n-nodes-ldo-1c-relay`

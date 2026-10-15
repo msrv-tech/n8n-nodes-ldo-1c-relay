@@ -1,0 +1,8 @@
+{
+  "database": "registered-demo-reference",
+  "n8nUrl": "https://n8n-demo.example.invalid",
+  "n8nApiKeyEnv": "LDO_TEST_N8N_API_KEY",
+  "directServiceUrl": "https://1c-demo.example.invalid/base/hs/ldo_n8n",
+  "nodePackageVersion": "0.4.0-unreleased-build",
+  "modes": ["queue", "direct"]
+}

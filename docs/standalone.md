@@ -1,6 +1,6 @@
 # Standalone 1C connections
 
-This guide describes version 0.3.0 and the matching UNF 6.7.1.0 extension.
+This guide describes version 0.3.0. Simple standalone connections were introduced in UNF 6.7.1.0; the ordinary UNF 6.7.1.2 build also passed a fresh-instance queue UI read/write test. See the [capabilities registry](capabilities/README.md) for operation details and version-specific evidence.
 Version 0.2.0 does not include the simple credentials or pairing wizard.
 
 Node version 2 defaults to **Standalone Queue**. It never supplies an MSRV URL,
@@ -38,7 +38,7 @@ Public API access and Data Tables must be available in the selected instance.
    the same code cannot bind another database or profile.
 5. In business workflows, choose **Standalone Queue**, the saved credential,
    and the new **Connection** from the list. Database/profile/policy identifiers
-   are discovered automatically. Configure the extension's polling schedule.
+   are discovered automatically. Configure the extension's polling schedule. In the ordinary build, enable the native LDO polling job and ensure that database-copy restrictions and the server scheduled-job denial do not block it. Fresh requires its service-managed scheduler; do not assume the ordinary native job exists there.
 
 Use HTTPS for production. The production gateway URL must be reachable from
 1C. If it differs from the credential's API URL, enter **Public n8n URL** when

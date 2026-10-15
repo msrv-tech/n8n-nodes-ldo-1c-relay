@@ -1,0 +1,212 @@
+{
+  "schemaVersion": 1,
+  "packageVersion": "0.4.0-unreleased-build",
+  "method": "Real n8n node workflows via Public API and authenticated webhooks; server fixtures/assertions via registered 1C bridge",
+  "initialApprovalCapture": {
+    "captureEnabled": false,
+    "epochPresent": false,
+    "installedExtensions": [
+      {
+        "name": "CodexTestBridge",
+        "version": "0.8.1"
+      },
+      {
+        "name": "ЛегкийДокументооборотДляУНФ",
+        "version": "6.8.1.0"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "prepare-and-pair",
+      "status": "passed",
+      "coverage": [
+        "create-connection",
+        "queue-gateway",
+        "extension-distribution"
+      ],
+      "detail": "",
+      "seconds": 0
+    },
+    {
+      "id": "ordinary-event-onboarding",
+      "status": "passed",
+      "coverage": [
+        "extension-distribution"
+      ],
+      "detail": "Native pairing enabled approval capture and its epoch without additional bridge configuration",
+      "seconds": 0
+    },
+    {
+      "id": "queue/search-native-policy",
+      "status": "passed",
+      "coverage": [
+        "search-documents",
+        "search-catalog-items",
+        "dynamic-policy"
+      ],
+      "detail": "",
+      "seconds": 0.18
+    },
+    {
+      "id": "direct/search-native-policy",
+      "status": "passed",
+      "coverage": [
+        "search-documents",
+        "search-catalog-items",
+        "dynamic-policy"
+      ],
+      "detail": "",
+      "seconds": 0.13
+    },
+    {
+      "id": "msrv-pdf-confirm",
+      "status": "not-run",
+      "coverage": [
+        "confirm-pdf-delivery"
+      ],
+      "detail": "Requires isolated enrolled MSRV fixture; existing contract tests cover this action, no MSRV enrollment is provisioned by this suite",
+      "seconds": 0
+    },
+    {
+      "id": "ai-tool-live",
+      "status": "not-run",
+      "coverage": [
+        "ai-tool"
+      ],
+      "detail": "Select the ai-tool scenario and configure a reachable local model",
+      "seconds": 0
+    }
+  ],
+  "cleanup": "passed",
+  "pairedApprovalCapture": {
+    "captureEnabled": true,
+    "epochPresent": true,
+    "installedExtensions": [
+      {
+        "name": "CodexTestBridge",
+        "version": "0.8.1"
+      },
+      {
+        "name": "ЛегкийДокументооборотДляУНФ",
+        "version": "6.8.1.0"
+      }
+    ]
+  },
+  "unmapped": [
+    "acknowledge-event",
+    "cancel-external-process",
+    "clean-completed-entries",
+    "connection-status",
+    "disconnect-connection",
+    "get-capabilities",
+    "get-catalog-fields",
+    "get-document-fields",
+    "get-external-process",
+    "get-queue-result",
+    "lease-events",
+    "prepare-document-pdf",
+    "renew-pairing",
+    "retry-event",
+    "search-reference-values",
+    "start-external-process",
+    "transition-external-process",
+    "update-catalog-fields",
+    "update-document-fields",
+    "update-external-process-fields",
+    "update-reference-field",
+    "wait-recovery",
+    "write-receipts"
+  ],
+  "durationSeconds": 5.66,
+  "overall": "passed-with-explicit-gaps",
+  "capabilities": {
+    "acknowledge-event": [],
+    "ai-tool": [
+      {
+        "case": "ai-tool-live",
+        "status": "not-run"
+      }
+    ],
+    "cancel-external-process": [],
+    "clean-completed-entries": [],
+    "confirm-pdf-delivery": [
+      {
+        "case": "msrv-pdf-confirm",
+        "status": "not-run"
+      }
+    ],
+    "connection-status": [],
+    "create-connection": [
+      {
+        "case": "prepare-and-pair",
+        "status": "passed"
+      }
+    ],
+    "disconnect-connection": [],
+    "dynamic-policy": [
+      {
+        "case": "queue/search-native-policy",
+        "status": "passed"
+      },
+      {
+        "case": "direct/search-native-policy",
+        "status": "passed"
+      }
+    ],
+    "extension-distribution": [
+      {
+        "case": "prepare-and-pair",
+        "status": "passed"
+      },
+      {
+        "case": "ordinary-event-onboarding",
+        "status": "passed"
+      }
+    ],
+    "get-capabilities": [],
+    "get-catalog-fields": [],
+    "get-document-fields": [],
+    "get-external-process": [],
+    "get-queue-result": [],
+    "lease-events": [],
+    "prepare-document-pdf": [],
+    "queue-gateway": [
+      {
+        "case": "prepare-and-pair",
+        "status": "passed"
+      }
+    ],
+    "renew-pairing": [],
+    "retry-event": [],
+    "search-catalog-items": [
+      {
+        "case": "queue/search-native-policy",
+        "status": "passed"
+      },
+      {
+        "case": "direct/search-native-policy",
+        "status": "passed"
+      }
+    ],
+    "search-documents": [
+      {
+        "case": "queue/search-native-policy",
+        "status": "passed"
+      },
+      {
+        "case": "direct/search-native-policy",
+        "status": "passed"
+      }
+    ],
+    "search-reference-values": [],
+    "start-external-process": [],
+    "transition-external-process": [],
+    "update-catalog-fields": [],
+    "update-document-fields": [],
+    "update-external-process-fields": [],
+    "update-reference-field": [],
+    "wait-recovery": [],
+    "write-receipts": []
+  }
+}

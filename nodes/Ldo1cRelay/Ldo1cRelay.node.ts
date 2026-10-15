@@ -12,7 +12,8 @@ import {
 	type INodePropertyOptions,
 } from 'n8n-workflow';
 import type { Capabilities, RelayEvent, ReferenceValue } from './types';
-import { connectionMode, directCommand, directConnection } from './connection';
+import { searchOperation } from './search';
+import { CommandFailure, connectionMode, directCommand, directConnection } from './connection';
 import {
 	createQueueConnection,
 	listQueueConnections,
@@ -242,6 +243,26 @@ export class Ldo1cRelay implements INodeType {
 					)
 					.map((item) => ({ name: item.object_type, value: item.object_type }));
 			},
+			async getSearchDocumentTypes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				return ((await catalogue(this)).object_types || [])
+					.filter((item) => item.operations?.includes('document.search'))
+					.map((item) => ({ name: item.object_type, value: item.object_type }));
+			},
+			async getSearchCatalogTypes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				return ((await catalogue(this)).object_types || [])
+					.filter((item) => item.operations?.includes('catalog.search'))
+					.map((item) => ({ name: item.object_type, value: item.object_type }));
+			},
+			async getSearchFilters(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const object = selectedObject(
+					await catalogue(this),
+					String(this.getCurrentNodeParameter('searchObjectType')),
+				);
+				return (object?.search?.filters || []).map((field) => ({
+					name: `${field.id} (${field.value_type}; ${field.match_modes.join(', ')})`,
+					value: field.id,
+				}));
+			},
 			async getCatalogTypes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const capabilities = await catalogue(this);
 				return (capabilities.object_types || [])
@@ -468,7 +489,7 @@ export class Ldo1cRelay implements INodeType {
 					'Whether to wait in this node. Disable to return the Command ID immediately and continue with a Wait node and Queue: Get Result.',
 				displayOptions: {
 					show: { '@version': [2], connectionMode: ['queue'], resource: ['operation'] },
-					hide: { operation: ['referenceFieldUpdate'] },
+					hide: { operation: ['referenceFieldUpdate', 'documentSearch', 'catalogSearch'] },
 				},
 			},
 			{
@@ -549,6 +570,7 @@ export class Ldo1cRelay implements INodeType {
 					'Optional UUID. Reuse the same ID and payload to recover a retained queue result after a timeout.',
 				displayOptions: {
 					show: { '@version': [2], connectionMode: ['queue'], resource: ['operation'] },
+					hide: { operation: ['referenceFieldUpdate', 'documentSearch', 'catalogSearch'] },
 				},
 			},
 			{
@@ -629,6 +651,18 @@ export class Ldo1cRelay implements INodeType {
 						action: 'Prepare document PDF',
 					},
 					{
+						name: 'Search Catalog Items',
+						value: 'catalogSearch',
+						description: 'Find catalog items using locally permitted filters',
+						action: 'Search catalog items',
+					},
+					{
+						name: 'Search Documents',
+						value: 'documentSearch',
+						description: 'Find documents using locally permitted filters',
+						action: 'Search documents',
+					},
+					{
 						name: 'Search Reference Values',
 						value: 'referenceSearch',
 						description: 'Search reference values using the selected connection',
@@ -672,6 +706,148 @@ export class Ldo1cRelay implements INodeType {
 					},
 				],
 				displayOptions: { show: { resource: ['operation'] } },
+			},
+			{
+				displayName: 'Document Type Name or ID',
+				name: 'searchObjectType',
+				type: 'options',
+				default: '',
+				required: true,
+				description:
+					'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+				typeOptions: { loadOptionsMethod: 'getSearchDocumentTypes' },
+				displayOptions: { show: { resource: ['operation'], operation: ['documentSearch'] } },
+			},
+			{
+				displayName: 'Catalog Type Name or ID',
+				name: 'searchObjectType',
+				type: 'options',
+				default: '',
+				required: true,
+				description:
+					'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+				typeOptions: { loadOptionsMethod: 'getSearchCatalogTypes' },
+				displayOptions: { show: { resource: ['operation'], operation: ['catalogSearch'] } },
+			},
+			{
+				displayName: 'Filters',
+				name: 'searchFilters',
+				type: 'fixedCollection',
+				default: {},
+				required: true,
+				placeholder: 'Add Filter',
+				typeOptions: { multipleValues: true },
+				displayOptions: {
+					show: { resource: ['operation'], operation: ['documentSearch', 'catalogSearch'] },
+				},
+				options: [
+					{
+						name: 'conditions',
+						displayName: 'Filter',
+						values: [
+							{
+								displayName: 'Filter Name or ID',
+								name: 'field',
+								type: 'options',
+								default: '',
+								required: true,
+								description:
+									'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+								typeOptions: {
+									loadOptionsMethod: 'getSearchFilters',
+									loadOptionsDependsOn: ['searchObjectType'],
+								},
+							},
+							{
+								displayName: 'Match',
+								name: 'match',
+								type: 'options',
+								default: 'exact',
+								options: [
+									{ name: 'Between Dates', value: 'between' },
+									{ name: 'Contains', value: 'contains' },
+									{ name: 'Exact', value: 'exact' },
+									{ name: 'Starts With', value: 'startsWith' },
+								],
+								description: 'Only modes permitted by the selected local filter are accepted',
+							},
+							{
+								displayName: 'Value',
+								name: 'value',
+								type: 'string',
+								default: '',
+								required: true,
+								description:
+									'Text, reference ID, or calendar date YYYY-MM-DD; for Between Dates this is the first day',
+							},
+							{
+								displayName: 'Last Day',
+								name: 'to',
+								type: 'string',
+								default: '',
+								description: 'Inclusive last calendar day YYYY-MM-DD for Between Dates',
+							},
+						],
+					},
+				],
+			},
+			{
+				displayName: 'Result Mode',
+				name: 'searchResultMode',
+				type: 'options',
+				default: 'list',
+				options: [
+					{ name: 'List', value: 'list' },
+					{ name: 'Single Match', value: 'single' },
+				],
+				description: 'Single Match rejects missing or ambiguous results',
+				displayOptions: {
+					show: { resource: ['operation'], operation: ['documentSearch', 'catalogSearch'] },
+				},
+			},
+			{
+				displayName: 'Return All',
+				name: 'searchReturnAll',
+				type: 'boolean',
+				default: false,
+				description: 'Whether to return all results within the local policy limit',
+				displayOptions: {
+					show: {
+						resource: ['operation'],
+						operation: ['documentSearch', 'catalogSearch'],
+						searchResultMode: ['list'],
+					},
+				},
+			},
+			{
+				displayName: 'Limit',
+				name: 'searchLimit',
+				type: 'number',
+				default: 20,
+				description: 'Max number of results to return',
+				typeOptions: { minValue: 1, maxValue: 50 },
+				displayOptions: {
+					show: {
+						resource: ['operation'],
+						operation: ['documentSearch', 'catalogSearch'],
+						searchResultMode: ['list'],
+						searchReturnAll: [false],
+					},
+				},
+			},
+			{
+				displayName: 'Cursor',
+				name: 'searchCursor',
+				type: 'string',
+				default: '',
+				description: 'Continue a previous page with the same filters and policy',
+				displayOptions: {
+					show: {
+						resource: ['operation'],
+						operation: ['documentSearch', 'catalogSearch'],
+						searchResultMode: ['list'],
+					},
+				},
 			},
 			{
 				displayName: 'External Process Profile Name or ID',
@@ -1563,10 +1739,26 @@ export class Ldo1cRelay implements INodeType {
 					output.push(...(await Ldo1cRelay.prototype.events.call(this, index)));
 				else if (action === 'finalize')
 					output.push(await Ldo1cRelay.prototype.finalize.call(this, index));
+				else if (
+					['documentSearch', 'catalogSearch'].includes(
+						String(this.getNodeParameter('operation', index)),
+					)
+				)
+					output.push(
+						...(await searchOperation.call(this, index, await catalogue(this), runCommand)),
+					);
 				else output.push(await Ldo1cRelay.prototype.operation.call(this, index));
 			} catch (error) {
 				if (this.continueOnFail())
-					output.push({ json: { error: error.message }, pairedItem: { item: index } });
+					output.push({
+						json: {
+							error: error.message,
+							...(error instanceof CommandFailure
+								? { error_code: error.errorCode, _ldo: { command_id: error.commandId } }
+								: {}),
+						},
+						pairedItem: { item: index },
+					});
 				else throw relayError(this, error as Error, index);
 			}
 		}

@@ -1,10 +1,12 @@
 # n8n-nodes-ldo-1c-relay
 
+**Version 0.4.0** adds universal metadata-driven document/catalog search and queue cleanup/error fixes. Use an extension based on **LDO core 6.8**. [Public documentation](https://ldo.msrv.tech/docs/n8n/) describes operations and core/node compatibility.
+
 Connect a 1C database to n8n using your own **standalone queue**, **direct HTTP**, or an explicitly enrolled **MSRV Relay service**. Node version 2 defaults to the standalone queue: the separately installed extension polls your n8n, so the database does not need an inbound web publication. Standalone operation does not contact MSRV.
 
 **Release 0.3.0** simplifies standalone setup: direct HTTP uses URL/user/password, and queues connect using one pairing code. Version 0.2.0 introduced the original standalone transports. [Standalone connection setup](docs/standalone.md) documents their requirements and limitations. Existing version 1 workflows retain their Relay transport; npm 0.1.1 and earlier remain Relay-only.
 
-**Publication:** [version 0.3.0 is available on npm](https://www.npmjs.com/package/n8n-nodes-ldo-1c-relay/v/0.3.0), published through [GitHub Actions](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/actions/runs/38507750466) with npm provenance. The full official published-package scanner passed on 2026-10-14.
+**Publication:** releases are published through GitHub Actions with npm provenance. See the [npm versions](https://www.npmjs.com/package/n8n-nodes-ldo-1c-relay?activeTab=versions) for the available releases.
 
 **Verification status:** this node has not been verified by n8n. The earlier Relay submission passed automated review on 2026-10-13. An English demonstration of version 0.3.0 was submitted on 2026-10-14; the Creator Portal now shows **Manual Review: Under Review**. Installing through the n8n Cloud node panel requires verification.
 
@@ -30,9 +32,11 @@ The credential's **Minimum Wait (Seconds)** defaults to 900 for a database that 
 
 ## Operations
 
+The [capabilities registry](docs/capabilities/README.md) contains every action, its actual UI parameters, results, transport support, limitations, and version-specific validation evidence (currently in Russian). [Portable JSON](docs/capabilities/catalog.json) is generated from the same registry and node UI metadata. See [maintenance and knowledge-base structure](docs/knowledge-base.md).
+
 | Resource     | Operations                                                                                                                                                                                           |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1C Operation | Get capabilities; get/update document fields; get/update catalog fields; search references; update a reference field; prepare a document PDF; start/get/transition/update/cancel an external process |
+| 1C Operation | Get capabilities; get/update document fields; get/update catalog fields; search documents/catalog items; search references; update a reference field; prepare a document PDF; start/get/transition/update/cancel an external process |
 | Event        | Lease approval-started, document-approved, or document-rejected events                                                                                                                               |
 | Delivery     | Acknowledge an event; confirm PDF delivery and acknowledge its event; schedule an event retry                                                                                                        |
 | Connection   | Create connection; get status; renew pairing code; disconnect |
@@ -66,6 +70,12 @@ Confirm delivery only after the destination accepts the file. If delivery fails,
 - After a timeout, the original command may still be queued. In standalone mode, retrieve its result or reuse its Command ID and original payload. A new Command ID represents a new operation.
 - Standalone PDFs are limited to 7 MiB and consume Data Table space when queued. Delivery is at least once; simultaneous submissions can create duplicate transport rows, while 1C receipts prevent repeating the same write.
 - Configure execution-data retention in your n8n instance for business data and PDF files.
+
+## Reproducible capability tests
+
+The [server suite](test/integration/README.md) executes installed nodes through the n8n Public API and authenticated webhooks. CodexTestBridge prepares disposable UNF fixtures and independently verifies their effects. The [coverage matrix](test/integration/coverage.md) maps every action and feature; CI rejects missing mappings.
+
+The [2026-10-14 full report](docs/capabilities/evidence/unf2-server-2026-10-14.md) records 30 passed, 4 transport-inapplicable cases and 1 live MSRV case not run. It used unreleased node 0.3.1 and ordinary UNF 6.7.1.3. These records retain their original pre-release versions; the fixes are included in 0.4.0. Fixture settings and routing were restored and owned test resources removed.
 
 ## Development
 

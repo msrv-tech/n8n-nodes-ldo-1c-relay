@@ -1,0 +1,5030 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-10-15",
+  "package": "n8n-nodes-ldo-1c-relay",
+  "packageVersion": "0.4.0",
+  "nodeVersions": [
+    1,
+    2
+  ],
+  "contractVersion": "1.0",
+  "coreVersion": "6.8",
+  "language": "ru",
+  "description": "Реестр ноды 0.4.0 для ядра ЛДО 6.8. Исторические отчёты сохраняют исходные версии; сведения о публикации доступны в npm.",
+  "transports": [
+    {
+      "id": "queue",
+      "title": "Своя очередь",
+      "credential": "LDO 1C Standalone Queue API",
+      "authentication": "URL своего n8n, API key; одноразовый код в 1С. API key не передаётся в 1С.",
+      "requirements": "Self-hosted n8n с Public API/Data Tables; исходящая доступность gateway из 1С; работающий опрос расширения.",
+      "msrvAccess": "Не требуется; автоматического fallback в MSRV нет.",
+      "guide": "../standalone.md"
+    },
+    {
+      "id": "direct",
+      "title": "Прямой HTTP",
+      "credential": "LDO 1C Direct API",
+      "authentication": "URL опубликованного сервиса 1С, логин и пароль штатного пользователя. Профиль определяется автоматически.",
+      "requirements": "Публикация ldo_n8n и доступность из n8n; разрешён прямой доступ пользователя.",
+      "msrvAccess": "Не требуется.",
+      "guide": "../standalone.md"
+    },
+    {
+      "id": "msrv",
+      "title": "Сервис MSRV",
+      "credential": "LDO Relay API",
+      "authentication": "Relay URL и scoped token, database/profile/policy identifiers от оператора.",
+      "requirements": "Явное подключение к сервису MSRV; исходящий опрос 1С и локальная политика.",
+      "msrvAccess": "Только по отдельному подключению и серверной авторизации.",
+      "guide": "../connection.md"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "unf2-ui-030",
+      "level": "real-ui",
+      "date": "2026-10-14",
+      "versions": "npm 0.3.0; self-hosted n8n 2.36.9; обычная УНФ 6.7.1.2; конфигурация 3.0.14.168",
+      "scope": "UI: установка npm, credential test, сопряжение; автоматическое чтение number/date и изменение комментария непроведённого счёта; новое значение подтверждено перечитыванием в 1С.",
+      "source": "evidence/unf2-ui-2026-10-14.md"
+    },
+    {
+      "id": "standalone-020",
+      "level": "reported-real",
+      "date": "2026-10-13",
+      "versions": "npm 0.2.0; self-hosted n8n 2.36.9; УНФ 6.6.1.0",
+      "scope": "Отчёт предыдущего релиза: чтение и PDF в queue/direct; persisted Wait; events lease/retry/ack; AI tool; конкурирующие аренды и сохранение результата после restart. Это не повтор всех сценариев на 0.3.0/6.7.1.2.",
+      "source": "https://github.com/msrv-tech/ldo/blob/main/docs/n8n-standalone-implementation.md#подтверждённые-проверки"
+    },
+    {
+      "id": "direct-review-030",
+      "level": "reported-real",
+      "date": "2026-10-14",
+      "versions": "Опубликованный npm 0.3.0; self-hosted n8n; УНФ в демонстрации 0.3.0",
+      "scope": "Отчёт демонстрации: native Direct credential, чтение, запись и AI tool call. Полный новый прогон PDF/Wait здесь не заявлен.",
+      "source": "https://github.com/msrv-tech/ldo/blob/main/docs/n8n-simple-connection-and-pairing.md#статус"
+    },
+    {
+      "id": "relay-010",
+      "level": "reported-real",
+      "date": "2026-10-13",
+      "versions": "npm 0.1.0; n8n 2.36.9; ЛДО 6.5.1.0",
+      "scope": "Исторический Relay workflow: process start/get/transition/fields.update, document read/update. Это не покрытие отмены процесса или всех транспортов текущего выпуска.",
+      "source": "../verification.md#validation-evidence"
+    },
+    {
+      "id": "unf2-server-031",
+      "level": "real-server",
+      "date": "2026-10-14",
+      "versions": "Рабочая нода 0.3.1 (не опубликована), n8n 2.36.9, обычная УНФ 6.7.1.3, CodexTestBridge 0.8.1; УНФ 3.0.14.168",
+      "scope": "Полный воспроизводимый прогон queue/direct: 30 PASS, 4 not-applicable, MSRV Confirm PDF Delivery not-run. Событие → ID из payload → чтение → retry/ack; документы/справочники/ссылки/процессы/PDF/Wait/версии/подключение/AI. Настройки и маршрут восстановлены. Scheduler, Cloud и другие конфигурации не заявлены проверенными этим прогоном.",
+      "source": "evidence/unf2-server-2026-10-14.md"
+    },
+    {
+      "id": "universal-search-040",
+      "level": "real-server",
+      "date": "2026-10-14",
+      "versions": "Рабочая нода 0.4.0, n8n 2.36.9, обычная УНФ 6.8.1.0, CodexTestBridge 0.8.1; общий код CORE 6.8.0.0",
+      "scope": "Полный прогон queue/direct: 34 passed, 4 not-applicable, MSRV PDF delivery not-run. Поиск документов и справочников по политике метаданных → чтение по найденному ID; номер/дата/организация, наименование/ИНН, страницы/Return All, пустые и неоднозначные результаты, invalid date/period/cursor. Cleanup passed.",
+      "source": "evidence/search-universal-2026-10-14.md"
+    }
+  ],
+  "features": [
+    {
+      "id": "queue-gateway",
+      "title": "LDO 1C Queue Gateway Trigger",
+      "status": "implemented",
+      "summary": "Отдельная служебная нода POST 1c-queue для pair/sync/poll/result/event. Возвращает ответ напрямую, без бизнес-executions для опроса. Создаётся Create Connection.",
+      "limitations": "Не является триггером бизнес-событий. Активность workflow не доказывает работу регламентного задания 1С.",
+      "source": "../../nodes/Ldo1cQueueTrigger/Ldo1cQueueTrigger.node.ts",
+      "evidence": [
+        "unf2-ui-030",
+        "standalone-020",
+        "unf2-server-031",
+        "universal-search-040"
+      ]
+    },
+    {
+      "id": "dynamic-policy",
+      "title": "Динамические разрешения",
+      "status": "implemented",
+      "summary": "Типы объектов, поля, печатные формы и процессы выбираются из capabilities конкретной базы. Изменения политики своей очереди синхронизируются опросом.",
+      "limitations": "Локальная политика, native permissions/RLS и ревизия повторно проверяются в 1С; capabilities не выдаёт новые права.",
+      "source": "../standalone.md",
+      "evidence": [
+        "unf2-ui-030",
+        "unf2-server-031",
+        "universal-search-040"
+      ]
+    },
+    {
+      "id": "ai-tool",
+      "title": "Использование как инструмента AI-агента",
+      "status": "implemented",
+      "summary": "Основная нода объявлена usableAsTool=true; разрешённую операцию можно подключить к AI Agent.",
+      "limitations": "Не включает модель и не даёт произвольный доступ к 1С. Gateway инструментом агента не является.",
+      "source": "../../nodes/Ldo1cRelay/Ldo1cRelay.node.ts",
+      "evidence": [
+        "direct-review-030",
+        "standalone-020",
+        "unf2-server-031",
+        "universal-search-040"
+      ]
+    },
+    {
+      "id": "wait-recovery",
+      "title": "Ожидание и восстановление",
+      "status": "implemented",
+      "summary": "Timeout 1–1800 секунд; Poll Interval 1–30. Для очереди эффективный timeout не меньше Minimum Wait credential (по умолчанию 900). Можно использовать Wait/Get Result.",
+      "limitations": "Синхронное ожидание занимает worker. Command ID + исходный payload восстанавливают результат; новый ID — новая операция. Для составного Update Reference Field отдельные ограничения.",
+      "source": "../standalone.md#waiting-and-recovery",
+      "evidence": [
+        "standalone-020",
+        "unf2-server-031",
+        "universal-search-040"
+      ]
+    },
+    {
+      "id": "write-receipts",
+      "title": "Повторы записи и версии",
+      "status": "implemented",
+      "summary": "Expected revision защищает от параллельных изменений; квитанции 1С сохраняют результат вместе с записью. Точный повтор не применяет запись второй раз.",
+      "limitations": "Доставка at least once; транспортные дубли возможны. Иной payload с тем же ID отклоняется. После result_expired запись не повторяется.",
+      "source": "../standalone.md#waiting-and-recovery",
+      "evidence": [
+        "unf2-server-031",
+        "universal-search-040"
+      ]
+    },
+    {
+      "id": "extension-distribution",
+      "title": "Отдельная поставка расширения 1С",
+      "status": "implemented",
+      "summary": "npm содержит ноду; CFE устанавливается отдельно для конкретной конфигурации и среды.",
+      "limitations": "Standalone внедрён в УНФ с 6.7.1.0; обычная сборка содержит native poller. Для Fresh требуется штатный механизм расписания сервиса; наличие кода CORE не подтверждает совместимость других конфигураций.",
+      "source": "../standalone.md",
+      "evidence": [
+        "unf2-ui-030",
+        "unf2-server-031",
+        "universal-search-040"
+      ]
+    }
+  ],
+  "gaps": [
+    {
+      "id": "document-search",
+      "title": "Поиск/список документов по реквизитам",
+      "status": "validated",
+      "description": "Универсальный поиск доступен с нодой 0.4.0 и ядром ЛДО 6.8 через queue/direct. Локальная политика определяет доступные объекты и фильтры.",
+      "design": "../design/document-search.md",
+      "evidence": [
+        "universal-search-040"
+      ]
+    },
+    {
+      "id": "document-create",
+      "title": "Создание документов",
+      "status": "not-implemented",
+      "description": "Нет операции создания документов в публичной ноде. Исторические демо-обработчики расширения не являются её возможностью."
+    },
+    {
+      "id": "document-post",
+      "title": "Проведение и отмена проведения",
+      "status": "not-implemented",
+      "description": "Нет операций публичной ноды для проведения, распроведения и удаления документов."
+    },
+    {
+      "id": "tabular-parts",
+      "title": "Табличные части",
+      "status": "not-implemented",
+      "description": "Нет универсального чтения/записи строк, номенклатуры, цен, скидок и расчётов."
+    },
+    {
+      "id": "generic-catalog-search",
+      "title": "Общий поиск элементов справочников",
+      "status": "validated",
+      "description": "Универсальный поиск доступен с нодой 0.4.0 и ядром ЛДО 6.8 через queue/direct. Локальная политика определяет доступные объекты и фильтры.",
+      "evidence": [
+        "universal-search-040"
+      ]
+    },
+    {
+      "id": "event-without-manual-id",
+      "title": "Событийный сценарий без ручного UID в свежей УНФ2",
+      "status": "validated",
+      "description": "Подтверждено серверным прогоном на рабочей ноде 0.3.1 и обычной УНФ 6.7.1.3: native approval.started → выражения payload.object.type/id → чтение → retry/ack; после ack повторной выдачи нет. Первое сопряжение включает фиксацию событий. Исправления включены в релиз ноды 0.4.0 и ядра 6.8; исторические результаты сохраняют исходные версии.",
+      "evidence": [
+        "unf2-server-031"
+      ]
+    },
+    {
+      "id": "cloud-and-other-configs",
+      "title": "n8n Cloud и другие конфигурации 1С",
+      "status": "needs-validation",
+      "description": "Нет подтверждения текущего сочетания на n8n Cloud, иных версиях/режимах n8n и иных конфигурациях. Verified-статус нельзя выводить из успешного локального теста."
+    },
+    {
+      "id": "catalog-create",
+      "title": "Создание элементов справочников",
+      "status": "not-implemented",
+      "description": "Нода читает, ищет и изменяет существующие элементы; создание не входит в текущую реализацию."
+    }
+  ],
+  "operations": [
+    {
+      "id": "get-capabilities",
+      "resource": "operation",
+      "operation": "capabilities",
+      "title": "Возможности подключённой базы",
+      "summary": "Получить разрешённые типы объектов, поля чтения и записи, формы и профили процессов.",
+      "status": "implemented",
+      "transports": [
+        "queue",
+        "direct",
+        "msrv"
+      ],
+      "commands": [
+        "n8n.capabilities.get"
+      ],
+      "outputs": [
+        "object_types",
+        "process_profiles",
+        "Другие опубликованные расширением признаки возможностей."
+      ],
+      "permissions": [
+        "Включённый профиль доступа."
+      ],
+      "limitations": [
+        "В своей очереди возвращается снимок, переданный при сопряжении или синхронизации; это не проверка исполнения команды в 1С.",
+        "В прямом HTTP читается текущий каталог; в MSRV выполняется команда через Relay.",
+        "Каталог не содержит список всех экземпляров документов."
+      ],
+      "example": "Manual Trigger → Get Capabilities → выбор типов и полей в настройках следующих нод.",
+      "evidence": [
+        "unf2-ui-030",
+        "standalone-020",
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "Профиль отключён, операция или объект не разрешены локальной политикой; недостаточно штатных прав 1С."
+      ],
+      "uiName": "Get Capabilities",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "waitForResult",
+          "label": "Wait for Result",
+          "type": "boolean",
+          "required": false,
+          "default": true,
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "commandId",
+          "label": "Command ID",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "timeoutSeconds",
+          "label": "Timeout (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 900,
+          "bounds": {
+            "min": 1,
+            "max": 1800
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "pollSeconds",
+          "label": "Poll Interval (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 2,
+          "bounds": {
+            "min": 1,
+            "max": 30
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "get-document-fields",
+      "resource": "operation",
+      "operation": "documentGet",
+      "title": "Чтение документа",
+      "summary": "Прочитать выбранные разрешённые поля существующего документа.",
+      "status": "implemented",
+      "transports": [
+        "queue",
+        "direct",
+        "msrv"
+      ],
+      "commands": [
+        "n8n.document.get"
+      ],
+      "outputs": [
+        "object: type, id",
+        "revision: строковая версия объекта",
+        "approval_state; approval_cycle при наличии доверенного снимка",
+        "values: выбранные поля",
+        "_ldo: command_id, operation"
+      ],
+      "permissions": [
+        "Тип документа и поля чтения включены в профиле; штатное Чтение и RLS."
+      ],
+      "limitations": [
+        "В текущем контракте чтения документа предусмотрены number и date.",
+        "Нужен Document ID. Ручной UUID в демонстрации не является способом поиска документа для пользователей."
+      ],
+      "example": "Событие 1С → Document ID из payload → Get Document Fields. В ноде 0.4.0 и ядре 6.8 также Search Documents → object.id → Get Document Fields.",
+      "evidence": [
+        "unf2-ui-030",
+        "direct-review-030",
+        "standalone-020",
+        "relay-010",
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "access_denied / field_not_allowed: объект или поле не разрешены.",
+        "object_not_found: объект отсутствует либо недоступен текущему пользователю."
+      ],
+      "uiName": "Get Document Fields",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "waitForResult",
+          "label": "Wait for Result",
+          "type": "boolean",
+          "required": false,
+          "default": true,
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "commandId",
+          "label": "Command ID",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "documentType",
+          "label": "Document Type Name or ID",
+          "type": "options",
+          "required": false,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentGet",
+                "documentFilePrepare"
+              ]
+            }
+          },
+          "optionsSource": "getDocumentTypes",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "documentId",
+          "label": "Document ID",
+          "type": "string",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentGet",
+                "documentFilePrepare"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "fields",
+          "label": "Field Names or IDs",
+          "type": "multiOptions",
+          "required": true,
+          "default": [],
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentGet"
+              ]
+            }
+          },
+          "optionsSource": "getDocumentFields",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "timeoutSeconds",
+          "label": "Timeout (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 900,
+          "bounds": {
+            "min": 1,
+            "max": 1800
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "pollSeconds",
+          "label": "Poll Interval (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 2,
+          "bounds": {
+            "min": 1,
+            "max": 30
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "update-document-fields",
+      "resource": "operation",
+      "operation": "documentFieldsUpdate",
+      "title": "Изменение полей документа",
+      "summary": "Изменить разрешённые поля существующего непроведённого документа с контролем версии.",
+      "status": "implemented",
+      "transports": [
+        "queue",
+        "direct",
+        "msrv"
+      ],
+      "commands": [
+        "n8n.document.fields.update"
+      ],
+      "outputs": [
+        "object",
+        "revision: новая версия",
+        "changes: old/new по ID полей",
+        "_ldo: command_id, operation"
+      ],
+      "permissions": [
+        "Поля записи опубликованы в профиле; штатные права записи и RLS."
+      ],
+      "limitations": [
+        "Проведённый документ отклоняется: document_not_editable.",
+        "Табличные части, проведение и произвольные реквизиты не поддерживаются.",
+        "Ключи Changes — ID из write_fields, а не произвольные имена реквизитов."
+      ],
+      "example": "Get Document Fields → проверка workflow → Update Document Fields с revision первого шага и JSON разрешённых изменений.",
+      "evidence": [
+        "unf2-ui-030",
+        "direct-review-030",
+        "relay-010",
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "access_denied / field_not_allowed: объект или поле не разрешены.",
+        "object_not_found: объект отсутствует либо недоступен текущему пользователю.",
+        "revision_conflict: документ изменился после чтения; прочитайте его снова и пересмотрите изменение.",
+        "field_value_invalid: значение не соответствует разрешённому типу.",
+        "document_not_editable: документ проведён."
+      ],
+      "uiName": "Update Document Fields",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "waitForResult",
+          "label": "Wait for Result",
+          "type": "boolean",
+          "required": false,
+          "default": true,
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "commandId",
+          "label": "Command ID",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "writeDocumentType",
+          "label": "Document Type Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentFieldsUpdate"
+              ]
+            }
+          },
+          "optionsSource": "getWritableDocumentTypes",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "writeDocumentId",
+          "label": "Document ID",
+          "type": "string",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentFieldsUpdate"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "expectedDocumentRevision",
+          "label": "Expected Document Revision",
+          "type": "string",
+          "required": true,
+          "default": "={{$json.revision}}",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentFieldsUpdate"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "documentChanges",
+          "label": "Changes (JSON)",
+          "type": "json",
+          "required": true,
+          "default": "{}",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentFieldsUpdate"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "timeoutSeconds",
+          "label": "Timeout (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 900,
+          "bounds": {
+            "min": 1,
+            "max": 1800
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "pollSeconds",
+          "label": "Poll Interval (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 2,
+          "bounds": {
+            "min": 1,
+            "max": 30
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "get-catalog-fields",
+      "resource": "operation",
+      "operation": "catalogGet",
+      "title": "Чтение элемента справочника",
+      "summary": "Прочитать разрешённые поля существующего элемента справочника.",
+      "status": "implemented",
+      "transports": [
+        "queue",
+        "direct",
+        "msrv"
+      ],
+      "commands": [
+        "n8n.catalog.get"
+      ],
+      "outputs": [
+        "object",
+        "revision",
+        "values",
+        "_ldo: command_id, operation"
+      ],
+      "permissions": [
+        "Тип справочника и поля чтения разрешены; штатное Чтение и RLS."
+      ],
+      "limitations": [
+        "Чтение принимает ID; его можно получить из Search Catalog Items.",
+        "Текущий контракт чтения содержит name и code."
+      ],
+      "example": "ID из предыдущего шага → Get Catalog Fields → обработка name/code.",
+      "evidence": [
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "access_denied / field_not_allowed: объект или поле не разрешены.",
+        "object_not_found: объект отсутствует либо недоступен текущему пользователю."
+      ],
+      "uiName": "Get Catalog Fields",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "waitForResult",
+          "label": "Wait for Result",
+          "type": "boolean",
+          "required": false,
+          "default": true,
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "commandId",
+          "label": "Command ID",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "catalogType",
+          "label": "Catalog Type Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "catalogGet"
+              ]
+            }
+          },
+          "optionsSource": "getCatalogTypes",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "catalogId",
+          "label": "Catalog Item ID",
+          "type": "string",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "catalogGet"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "catalogFields",
+          "label": "Field Names or IDs",
+          "type": "multiOptions",
+          "required": true,
+          "default": [],
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "catalogGet"
+              ]
+            }
+          },
+          "optionsSource": "getCatalogFields",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "timeoutSeconds",
+          "label": "Timeout (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 900,
+          "bounds": {
+            "min": 1,
+            "max": 1800
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "pollSeconds",
+          "label": "Poll Interval (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 2,
+          "bounds": {
+            "min": 1,
+            "max": 30
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "update-catalog-fields",
+      "resource": "operation",
+      "operation": "catalogFieldsUpdate",
+      "title": "Изменение элемента справочника",
+      "summary": "Записать разрешённые поля существующего элемента с ожидаемой версией.",
+      "status": "implemented",
+      "transports": [
+        "queue",
+        "direct",
+        "msrv"
+      ],
+      "commands": [
+        "n8n.catalog.fields.update"
+      ],
+      "outputs": [
+        "object",
+        "revision",
+        "changes: old/new",
+        "_ldo: command_id, operation"
+      ],
+      "permissions": [
+        "Поля записи разрешены; штатные права записи и RLS."
+      ],
+      "limitations": [
+        "Не создаёт элементы справочников.",
+        "Changes принимает ID опубликованных полей."
+      ],
+      "example": "Get Catalog Fields → проверка → Update Catalog Fields с ожидаемой revision.",
+      "evidence": [
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "access_denied / field_not_allowed: объект или поле не разрешены.",
+        "object_not_found: объект отсутствует либо недоступен текущему пользователю.",
+        "revision_conflict: документ изменился после чтения; прочитайте его снова и пересмотрите изменение.",
+        "field_value_invalid: значение не соответствует разрешённому типу."
+      ],
+      "uiName": "Update Catalog Fields",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "waitForResult",
+          "label": "Wait for Result",
+          "type": "boolean",
+          "required": false,
+          "default": true,
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "commandId",
+          "label": "Command ID",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "writeCatalogType",
+          "label": "Catalog Type Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "catalogFieldsUpdate"
+              ]
+            }
+          },
+          "optionsSource": "getWritableCatalogTypes",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "writeCatalogId",
+          "label": "Catalog Item ID",
+          "type": "string",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "catalogFieldsUpdate"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "expectedCatalogRevision",
+          "label": "Expected Revision",
+          "type": "string",
+          "required": true,
+          "default": "={{$json.revision}}",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "catalogFieldsUpdate"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "catalogChanges",
+          "label": "Changes (JSON)",
+          "type": "json",
+          "required": true,
+          "default": "{}",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "catalogFieldsUpdate"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "timeoutSeconds",
+          "label": "Timeout (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 900,
+          "bounds": {
+            "min": 1,
+            "max": 1800
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "pollSeconds",
+          "label": "Poll Interval (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 2,
+          "bounds": {
+            "min": 1,
+            "max": 30
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "search-reference-values",
+      "resource": "operation",
+      "operation": "referenceSearch",
+      "title": "Поиск значений ссылочного поля",
+      "summary": "Найти подходящие значения для конкретного разрешённого поля записи.",
+      "status": "implemented",
+      "transports": [
+        "queue",
+        "direct",
+        "msrv"
+      ],
+      "commands": [
+        "n8n.reference.search"
+      ],
+      "outputs": [
+        "object_type",
+        "field_id",
+        "reference: kind, metadata_name",
+        "items: id, presentation",
+        "truncated",
+        "_ldo: command_id, operation"
+      ],
+      "permissions": [
+        "Ссылочное поле и режим live-поиска разрешены локальной политикой."
+      ],
+      "limitations": [
+        "Запрос от двух символов; Limit 1–50, по умолчанию 20.",
+        "Целевой тип берётся из политики поля. Это может быть ссылка на справочник или документ, но не общий поиск документов по номеру, дате и организации."
+      ],
+      "example": "Выбрать ссылочное поле «Ответственный» → Search Reference Values → уточнить запрос → передать выбранный ID в запись.",
+      "evidence": [
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "Профиль отключён, операция или объект не разрешены локальной политикой; недостаточно штатных прав 1С."
+      ],
+      "uiName": "Search Reference Values",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "waitForResult",
+          "label": "Wait for Result",
+          "type": "boolean",
+          "required": false,
+          "default": true,
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "commandId",
+          "label": "Command ID",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "referenceObjectType",
+          "label": "Object Type Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "referenceSearch",
+                "referenceFieldUpdate"
+              ]
+            }
+          },
+          "optionsSource": "getReferenceWritableObjectTypes",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "referenceFieldId",
+          "label": "Reference Field Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "referenceSearch",
+                "referenceFieldUpdate"
+              ]
+            }
+          },
+          "optionsSource": "getReferenceWriteFields",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "referenceQuery",
+          "label": "Search Query",
+          "type": "string",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "referenceSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "referenceLimit",
+          "label": "Limit",
+          "type": "number",
+          "required": false,
+          "default": 20,
+          "bounds": {
+            "min": 1,
+            "max": 50
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "referenceSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "timeoutSeconds",
+          "label": "Timeout (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 900,
+          "bounds": {
+            "min": 1,
+            "max": 1800
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "pollSeconds",
+          "label": "Poll Interval (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 2,
+          "bounds": {
+            "min": 1,
+            "max": 30
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "update-reference-field",
+      "resource": "operation",
+      "operation": "referenceFieldUpdate",
+      "title": "Изменение ссылочного поля",
+      "summary": "Выбрать ссылочное значение по ID, через live-поиск или кэш и записать его в существующий объект.",
+      "status": "implemented",
+      "transports": [
+        "queue",
+        "direct",
+        "msrv"
+      ],
+      "commands": [
+        "n8n.reference.search (только live)",
+        "n8n.document.fields.update или n8n.catalog.fields.update"
+      ],
+      "outputs": [
+        "object",
+        "revision",
+        "changes",
+        "_ldo.reference: mode, id, presentation при наличии"
+      ],
+      "permissions": [
+        "Ссылочное write-поле и соответствующий selection mode разрешены; штатные права записи."
+      ],
+      "limitations": [
+        "Live-поиск должен вернуть ровно одно совпадение.",
+        "Кэш ограничен политикой и повторно проверяется в 1С при записи.",
+        "Операция синхронная; Wait for Result и пользовательский Command ID не управляют её составными шагами."
+      ],
+      "example": "Get Document Fields → Update Reference Field: Search at Execution → единственное разрешённое значение → запись.",
+      "evidence": [
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "access_denied / field_not_allowed: объект или поле не разрешены.",
+        "object_not_found: объект отсутствует либо недоступен текущему пользователю.",
+        "revision_conflict: документ изменился после чтения; прочитайте его снова и пересмотрите изменение.",
+        "field_value_invalid: значение не соответствует разрешённому типу.",
+        "Ноль или несколько совпадений; выбранное значение отсутствует в текущем кэше."
+      ],
+      "uiName": "Update Reference Field",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "referenceObjectType",
+          "label": "Object Type Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "referenceSearch",
+                "referenceFieldUpdate"
+              ]
+            }
+          },
+          "optionsSource": "getReferenceWritableObjectTypes",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "referenceFieldId",
+          "label": "Reference Field Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "referenceSearch",
+                "referenceFieldUpdate"
+              ]
+            }
+          },
+          "optionsSource": "getReferenceWriteFields",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "referenceOwnerId",
+          "label": "Object ID",
+          "type": "string",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "referenceFieldUpdate"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "referenceOwnerRevision",
+          "label": "Expected Object Revision",
+          "type": "string",
+          "required": true,
+          "default": "={{$json.revision}}",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "referenceFieldUpdate"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "referenceValueMode",
+          "label": "Value Source",
+          "type": "options",
+          "required": true,
+          "default": "id",
+          "choices": [
+            {
+              "value": "id",
+              "label": "ID"
+            },
+            {
+              "value": "live",
+              "label": "Search at Execution"
+            },
+            {
+              "value": "cache",
+              "label": "From Cache"
+            }
+          ],
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "referenceFieldUpdate"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "referenceValueId",
+          "label": "Reference Value ID",
+          "type": "string",
+          "required": true,
+          "default": "",
+          "condition": [
+            "id"
+          ],
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "referenceFieldUpdate"
+              ],
+              "referenceValueMode": [
+                "id"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "referenceLiveQuery",
+          "label": "Reference Search Query",
+          "type": "string",
+          "required": true,
+          "default": "",
+          "condition": [
+            "live"
+          ],
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "referenceFieldUpdate"
+              ],
+              "referenceValueMode": [
+                "live"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "referenceCachedId",
+          "label": "Cached Reference Value Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "condition": [
+            "cache"
+          ],
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "referenceFieldUpdate"
+              ],
+              "referenceValueMode": [
+                "cache"
+              ]
+            }
+          },
+          "optionsSource": "getReferenceCacheValues",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "timeoutSeconds",
+          "label": "Timeout (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 900,
+          "bounds": {
+            "min": 1,
+            "max": 1800
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "pollSeconds",
+          "label": "Poll Interval (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 2,
+          "bounds": {
+            "min": 1,
+            "max": 30
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "prepare-document-pdf",
+      "resource": "operation",
+      "operation": "documentFilePrepare",
+      "title": "PDF документа",
+      "summary": "Сформировать разрешённую печатную форму согласованного документа.",
+      "status": "implemented",
+      "transports": [
+        "queue",
+        "direct",
+        "msrv"
+      ],
+      "commands": [
+        "n8n.document.file.prepare"
+      ],
+      "outputs": [
+        "binary.data: PDF",
+        "filename, size_bytes, sha256",
+        "_ldo: command_id; в MSRV также event_id, file_id, sha256"
+      ],
+      "permissions": [
+        "Разрешены документ и form_id; проверены согласованный цикл и версия документа."
+      ],
+      "limitations": [
+        "Standalone: до 7 MiB; base64 занимает место в Data Tables.",
+        "Проверяются размер, PDF-заголовок и SHA-256.",
+        "Standalone возвращает PDF с результатом; MSRV скачивает временный файл из Relay."
+      ],
+      "example": "Prepare Document PDF → Send Email/S3. Для MSRV после успешной доставки добавить Confirm PDF Delivery.",
+      "evidence": [
+        "standalone-020",
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "Форма не разрешена; устарела версия или согласованный цикл; неверный PDF/хэш; превышен лимит."
+      ],
+      "uiName": "Prepare Document PDF",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "waitForResult",
+          "label": "Wait for Result",
+          "type": "boolean",
+          "required": false,
+          "default": true,
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "commandId",
+          "label": "Command ID",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "documentType",
+          "label": "Document Type Name or ID",
+          "type": "options",
+          "required": false,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentGet",
+                "documentFilePrepare"
+              ]
+            }
+          },
+          "optionsSource": "getDocumentTypes",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "documentId",
+          "label": "Document ID",
+          "type": "string",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentGet",
+                "documentFilePrepare"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "formId",
+          "label": "Print Form Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentFilePrepare"
+              ]
+            }
+          },
+          "optionsSource": "getPrintForms",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "revision",
+          "label": "Document Revision",
+          "type": "string",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentFilePrepare"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "timeoutSeconds",
+          "label": "Timeout (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 900,
+          "bounds": {
+            "min": 1,
+            "max": 1800
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "pollSeconds",
+          "label": "Poll Interval (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 2,
+          "bounds": {
+            "min": 1,
+            "max": 30
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "start-external-process",
+      "resource": "operation",
+      "operation": "processStart",
+      "title": "Запуск внешнего процесса",
+      "summary": "Создать экземпляр разрешённого профиля процесса для существующего документа.",
+      "status": "implemented",
+      "transports": [
+        "queue",
+        "direct",
+        "msrv"
+      ],
+      "commands": [
+        "n8n.process.start"
+      ],
+      "outputs": [
+        "process_id, process_profile_id",
+        "object: type, id",
+        "status, revision (число), active",
+        "values, updated_at",
+        "_ldo: command_id, operation"
+      ],
+      "permissions": [
+        "Профиль процесса и операция разрешены; переход/поля проверяются по локальной политике."
+      ],
+      "limitations": [
+        "Поля и статус принадлежат экземпляру внешнего процесса; исходный документ не изменяется."
+      ],
+      "example": "Document ID → Start External Process → сохранить process_id и revision.",
+      "evidence": [
+        "relay-010",
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "Профиль, переход или поле недоступны; версия не совпадает; процесс отсутствует или неактивен."
+      ],
+      "uiName": "Start External Process",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "waitForResult",
+          "label": "Wait for Result",
+          "type": "boolean",
+          "required": false,
+          "default": true,
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "commandId",
+          "label": "Command ID",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "processProfileId",
+          "label": "External Process Profile Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "processStart",
+                "processTransition",
+                "processFieldsUpdate"
+              ]
+            }
+          },
+          "optionsSource": "getProcessProfiles",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "processDocumentType",
+          "label": "Document Type Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "processStart"
+              ]
+            }
+          },
+          "optionsSource": "getProcessDocumentTypes",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "processDocumentId",
+          "label": "Document ID",
+          "type": "string",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "processStart"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "timeoutSeconds",
+          "label": "Timeout (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 900,
+          "bounds": {
+            "min": 1,
+            "max": 1800
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "pollSeconds",
+          "label": "Poll Interval (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 2,
+          "bounds": {
+            "min": 1,
+            "max": 30
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "get-external-process",
+      "resource": "operation",
+      "operation": "processGet",
+      "title": "Состояние внешнего процесса",
+      "summary": "Прочитать состояние и значения существующего экземпляра.",
+      "status": "implemented",
+      "transports": [
+        "queue",
+        "direct",
+        "msrv"
+      ],
+      "commands": [
+        "n8n.process.get"
+      ],
+      "outputs": [
+        "process_id, process_profile_id",
+        "object: type, id",
+        "status, revision (число), active",
+        "values, updated_at",
+        "_ldo: command_id, operation"
+      ],
+      "permissions": [
+        "Профиль процесса и операция разрешены; переход/поля проверяются по локальной политике."
+      ],
+      "limitations": [
+        "Поля и статус принадлежат экземпляру внешнего процесса; исходный документ не изменяется."
+      ],
+      "example": "process_id из предыдущего шага → Get External Process → IF по статусу.",
+      "evidence": [
+        "relay-010",
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "Профиль, переход или поле недоступны; версия не совпадает; процесс отсутствует или неактивен."
+      ],
+      "uiName": "Get External Process",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "waitForResult",
+          "label": "Wait for Result",
+          "type": "boolean",
+          "required": false,
+          "default": true,
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "commandId",
+          "label": "Command ID",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "processId",
+          "label": "External Process ID",
+          "type": "string",
+          "required": true,
+          "default": "={{$json.process_id}}",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "processGet",
+                "processTransition",
+                "processFieldsUpdate",
+                "processCancel"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "timeoutSeconds",
+          "label": "Timeout (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 900,
+          "bounds": {
+            "min": 1,
+            "max": 1800
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "pollSeconds",
+          "label": "Poll Interval (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 2,
+          "bounds": {
+            "min": 1,
+            "max": 30
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "transition-external-process",
+      "resource": "operation",
+      "operation": "processTransition",
+      "title": "Переход внешнего процесса",
+      "summary": "Выполнить разрешённый переход с ожидаемой версией и необязательными значениями полей.",
+      "status": "implemented",
+      "transports": [
+        "queue",
+        "direct",
+        "msrv"
+      ],
+      "commands": [
+        "n8n.process.transition"
+      ],
+      "outputs": [
+        "process_id, process_profile_id",
+        "object: type, id",
+        "status, revision (число), active",
+        "values, updated_at",
+        "_ldo: command_id, operation"
+      ],
+      "permissions": [
+        "Профиль процесса и операция разрешены; переход/поля проверяются по локальной политике."
+      ],
+      "limitations": [
+        "Поля и статус принадлежат экземпляру внешнего процесса; исходный документ не изменяется."
+      ],
+      "example": "Результат внешней проверки → Transition External Process с разрешённым transition_id.",
+      "evidence": [
+        "relay-010",
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "Профиль, переход или поле недоступны; версия не совпадает; процесс отсутствует или неактивен."
+      ],
+      "uiName": "Transition External Process",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "waitForResult",
+          "label": "Wait for Result",
+          "type": "boolean",
+          "required": false,
+          "default": true,
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "commandId",
+          "label": "Command ID",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "processProfileId",
+          "label": "External Process Profile Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "processStart",
+                "processTransition",
+                "processFieldsUpdate"
+              ]
+            }
+          },
+          "optionsSource": "getProcessProfiles",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "processId",
+          "label": "External Process ID",
+          "type": "string",
+          "required": true,
+          "default": "={{$json.process_id}}",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "processGet",
+                "processTransition",
+                "processFieldsUpdate",
+                "processCancel"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "expectedRevision",
+          "label": "Expected Revision",
+          "type": "number",
+          "required": true,
+          "default": 0,
+          "bounds": {
+            "min": 1
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "processTransition",
+                "processFieldsUpdate",
+                "processCancel"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "transitionId",
+          "label": "Transition Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "processTransition"
+              ]
+            }
+          },
+          "optionsSource": "getProcessTransitions",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "processValues",
+          "label": "Process Field Values (JSON)",
+          "type": "json",
+          "required": false,
+          "default": "{}",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "processTransition",
+                "processFieldsUpdate"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "timeoutSeconds",
+          "label": "Timeout (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 900,
+          "bounds": {
+            "min": 1,
+            "max": 1800
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "pollSeconds",
+          "label": "Poll Interval (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 2,
+          "bounds": {
+            "min": 1,
+            "max": 30
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "update-external-process-fields",
+      "resource": "operation",
+      "operation": "processFieldsUpdate",
+      "title": "Поля внешнего процесса",
+      "summary": "Изменить разрешённые поля экземпляра с ожидаемой версией.",
+      "status": "implemented",
+      "transports": [
+        "queue",
+        "direct",
+        "msrv"
+      ],
+      "commands": [
+        "n8n.process.fields.update"
+      ],
+      "outputs": [
+        "process_id, process_profile_id",
+        "object: type, id",
+        "status, revision (число), active",
+        "values, updated_at",
+        "_ldo: command_id, operation"
+      ],
+      "permissions": [
+        "Профиль процесса и операция разрешены; переход/поля проверяются по локальной политике."
+      ],
+      "limitations": [
+        "Поля и статус принадлежат экземпляру внешнего процесса; исходный документ не изменяется."
+      ],
+      "example": "Get External Process → Update External Process Fields → Get External Process.",
+      "evidence": [
+        "relay-010",
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "Профиль, переход или поле недоступны; версия не совпадает; процесс отсутствует или неактивен."
+      ],
+      "uiName": "Update External Process Fields",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "waitForResult",
+          "label": "Wait for Result",
+          "type": "boolean",
+          "required": false,
+          "default": true,
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "commandId",
+          "label": "Command ID",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "processProfileId",
+          "label": "External Process Profile Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "processStart",
+                "processTransition",
+                "processFieldsUpdate"
+              ]
+            }
+          },
+          "optionsSource": "getProcessProfiles",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "processId",
+          "label": "External Process ID",
+          "type": "string",
+          "required": true,
+          "default": "={{$json.process_id}}",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "processGet",
+                "processTransition",
+                "processFieldsUpdate",
+                "processCancel"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "expectedRevision",
+          "label": "Expected Revision",
+          "type": "number",
+          "required": true,
+          "default": 0,
+          "bounds": {
+            "min": 1
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "processTransition",
+                "processFieldsUpdate",
+                "processCancel"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "processValues",
+          "label": "Process Field Values (JSON)",
+          "type": "json",
+          "required": false,
+          "default": "{}",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "processTransition",
+                "processFieldsUpdate"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "timeoutSeconds",
+          "label": "Timeout (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 900,
+          "bounds": {
+            "min": 1,
+            "max": 1800
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "pollSeconds",
+          "label": "Poll Interval (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 2,
+          "bounds": {
+            "min": 1,
+            "max": 30
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cancel-external-process",
+      "resource": "operation",
+      "operation": "processCancel",
+      "title": "Отмена внешнего процесса",
+      "summary": "Отменить активный экземпляр с ожидаемой версией.",
+      "status": "implemented",
+      "transports": [
+        "queue",
+        "direct",
+        "msrv"
+      ],
+      "commands": [
+        "n8n.process.cancel"
+      ],
+      "outputs": [
+        "process_id, process_profile_id",
+        "object: type, id",
+        "status, revision (число), active",
+        "values, updated_at",
+        "_ldo: command_id, operation"
+      ],
+      "permissions": [
+        "Профиль процесса и операция разрешены; переход/поля проверяются по локальной политике."
+      ],
+      "limitations": [
+        "Поля и статус принадлежат экземпляру внешнего процесса; исходный документ не изменяется."
+      ],
+      "example": "Get External Process → проверка active/revision → Cancel External Process.",
+      "evidence": [
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "Профиль, переход или поле недоступны; версия не совпадает; процесс отсутствует или неактивен."
+      ],
+      "uiName": "Cancel External Process",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "waitForResult",
+          "label": "Wait for Result",
+          "type": "boolean",
+          "required": false,
+          "default": true,
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "commandId",
+          "label": "Command ID",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "operation"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "referenceFieldUpdate",
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "processId",
+          "label": "External Process ID",
+          "type": "string",
+          "required": true,
+          "default": "={{$json.process_id}}",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "processGet",
+                "processTransition",
+                "processFieldsUpdate",
+                "processCancel"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "expectedRevision",
+          "label": "Expected Revision",
+          "type": "number",
+          "required": true,
+          "default": 0,
+          "bounds": {
+            "min": 1
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "processTransition",
+                "processFieldsUpdate",
+                "processCancel"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "timeoutSeconds",
+          "label": "Timeout (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 900,
+          "bounds": {
+            "min": 1,
+            "max": 1800
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "pollSeconds",
+          "label": "Poll Interval (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 2,
+          "bounds": {
+            "min": 1,
+            "max": 30
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lease-events",
+      "resource": "events",
+      "operation": null,
+      "title": "Получение событий",
+      "summary": "Взять события approval.started, document.approved или document.rejected в обработку.",
+      "status": "implemented",
+      "transports": [
+        "queue",
+        "msrv"
+      ],
+      "commands": [],
+      "outputs": [
+        "id, item_type, payload",
+        "_ldo.event_id",
+        "Standalone: external_id и _ldo.lease_token"
+      ],
+      "permissions": [
+        "Активная локальная подписка и разрешённые типы событий."
+      ],
+      "limitations": [
+        "Это действие по расписанию, а не отдельный бизнес-триггер.",
+        "Limit 1–100, по умолчанию 50.",
+        "Прямой HTTP отправляет события через отдельно настроенный исходящий webhook."
+      ],
+      "example": "Schedule Trigger → Event → Switch → действие → Acknowledge Event.",
+      "evidence": [
+        "standalone-020",
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "События и подтверждения очереди недоступны в прямом HTTP."
+      ],
+      "uiName": "Lease Events",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "eventTypes",
+          "label": "Event Types",
+          "type": "multiOptions",
+          "required": true,
+          "default": [
+            "approval.started"
+          ],
+          "choices": [
+            {
+              "value": "approval.started",
+              "label": "Approval Started"
+            },
+            {
+              "value": "document.approved",
+              "label": "Document Approved"
+            },
+            {
+              "value": "document.rejected",
+              "label": "Document Rejected"
+            }
+          ],
+          "visibility": {
+            "show": {
+              "resource": [
+                "events"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "msrv"
+          ]
+        },
+        {
+          "name": "limit",
+          "label": "Limit",
+          "type": "number",
+          "required": false,
+          "default": 50,
+          "bounds": {
+            "min": 1,
+            "max": 100
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "events"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "msrv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "acknowledge-event",
+      "resource": "finalize",
+      "operation": "event",
+      "title": "Подтверждение события",
+      "summary": "Подтвердить успешное выполнение прикладного действия.",
+      "status": "implemented",
+      "transports": [
+        "queue",
+        "msrv"
+      ],
+      "commands": [],
+      "outputs": [
+        "Standalone: id, status=acknowledged",
+        "MSRV: ответ Relay на ack"
+      ],
+      "permissions": [
+        "Доступ к событию своей очереди; в standalone нужен текущий lease_token."
+      ],
+      "limitations": [
+        "Подтверждать после бизнес-действия, сохранив event_id и lease_token."
+      ],
+      "example": "Event → Send Email → Acknowledge Event.",
+      "evidence": [
+        "standalone-020",
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "Устаревшая аренда или событие недоступно."
+      ],
+      "uiName": "Acknowledge Event",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "leaseToken",
+          "label": "Event Lease Token",
+          "type": "string",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "finalize"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "eventId",
+          "label": "Event ID",
+          "type": "number",
+          "required": true,
+          "default": 0,
+          "visibility": {
+            "show": {
+              "resource": [
+                "finalize"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "msrv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "confirm-pdf-delivery",
+      "resource": "finalize",
+      "operation": "file",
+      "title": "Подтверждение доставки PDF",
+      "summary": "Подтвердить временный файл Relay и затем исходное событие.",
+      "status": "implemented",
+      "transports": [
+        "msrv"
+      ],
+      "commands": [],
+      "outputs": [
+        "Ответ Relay на подтверждение события"
+      ],
+      "permissions": [
+        "Scoped Relay credential и доступ к файлу/событию."
+      ],
+      "limitations": [
+        "Только MSRV. Для standalone доставку контролирует workflow назначения."
+      ],
+      "example": "Prepare Document PDF → успешная доставка → Confirm PDF Delivery с file_id, sha256 и event_id.",
+      "evidence": [],
+      "errors": [
+        "Некорректный ID/хэш; файл или событие недоступны; standalone/direct отклоняются."
+      ],
+      "uiName": "Confirm PDF Delivery",
+      "parameters": [
+        {
+          "name": "eventId",
+          "label": "Event ID",
+          "type": "number",
+          "required": true,
+          "default": 0,
+          "visibility": {
+            "show": {
+              "resource": [
+                "finalize"
+              ]
+            }
+          },
+          "transports": [
+            "msrv"
+          ]
+        },
+        {
+          "name": "fileId",
+          "label": "PDF ID",
+          "type": "string",
+          "required": true,
+          "default": "={{$json._ldo?.file_id || $json.file_id}}",
+          "visibility": {
+            "show": {
+              "resource": [
+                "finalize"
+              ],
+              "finalizeAction": [
+                "file"
+              ]
+            }
+          },
+          "transports": [
+            "msrv"
+          ]
+        },
+        {
+          "name": "sha256",
+          "label": "PDF SHA-256",
+          "type": "string",
+          "required": true,
+          "default": "={{$json._ldo?.sha256 || $json.sha256}}",
+          "visibility": {
+            "show": {
+              "resource": [
+                "finalize"
+              ],
+              "finalizeAction": [
+                "file"
+              ]
+            }
+          },
+          "transports": [
+            "msrv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "retry-event",
+      "resource": "finalize",
+      "operation": "fail",
+      "title": "Повтор события",
+      "summary": "Вернуть событие на повтор после временной ошибки.",
+      "status": "implemented",
+      "transports": [
+        "queue",
+        "msrv"
+      ],
+      "commands": [],
+      "outputs": [
+        "Standalone: id, status=retry_scheduled",
+        "MSRV: ответ Relay на fail"
+      ],
+      "permissions": [
+        "Доступ к событию; standalone требует текущую аренду."
+      ],
+      "limitations": [
+        "Задержка 0–86400 секунд, по умолчанию 60.",
+        "В standalone Failure Description показано в UI, но этот текст не передаётся finishEvent; в MSRV передаётся."
+      ],
+      "example": "Ошибка доставки → Retry Event → следующая аренда события.",
+      "evidence": [
+        "standalone-020",
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "Устаревшая аренда или событие недоступно."
+      ],
+      "uiName": "Retry Event",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "leaseToken",
+          "label": "Event Lease Token",
+          "type": "string",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "@version": [
+                2
+              ],
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "finalize"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "eventId",
+          "label": "Event ID",
+          "type": "number",
+          "required": true,
+          "default": 0,
+          "visibility": {
+            "show": {
+              "resource": [
+                "finalize"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "msrv"
+          ]
+        },
+        {
+          "name": "error",
+          "label": "Failure Description",
+          "type": "string",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "finalize"
+              ],
+              "finalizeAction": [
+                "fail"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "msrv"
+          ]
+        },
+        {
+          "name": "retryAfterSeconds",
+          "label": "Retry Delay (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 60,
+          "bounds": {
+            "min": 0,
+            "max": 86400
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "finalize"
+              ],
+              "finalizeAction": [
+                "fail"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "msrv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "create-connection",
+      "resource": "connection",
+      "operation": "createConnection",
+      "title": "Создание своей очереди",
+      "summary": "Создать Data Table и активный gateway workflow, выдать код сопряжения.",
+      "status": "implemented",
+      "transports": [
+        "queue"
+      ],
+      "commands": [],
+      "outputs": [
+        "connection_id, name, pairing_code, expires_at, gateway_url, workflow_id"
+      ],
+      "permissions": [
+        "n8n API key с необходимыми правами; для сопряжения — администратор 1С."
+      ],
+      "limitations": [
+        "Код действует 15 минут и является секретом; API key остаётся в n8n.",
+        "Нужны права Data Tables и создания/активации workflows."
+      ],
+      "example": "Create Connection → код в 1С → Подключить очередь по коду.",
+      "evidence": [
+        "unf2-ui-030",
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "Недостаточно прав n8n API; неверное состояние; настройка шлюза завершилась setup_failed."
+      ],
+      "uiName": "Create Connection",
+      "parameters": [
+        {
+          "name": "connectionName",
+          "label": "Connection Name",
+          "type": "string",
+          "required": true,
+          "default": "1C",
+          "visibility": {
+            "show": {
+              "resource": [
+                "connection"
+              ],
+              "operation": [
+                "createConnection"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "publicN8nUrl",
+          "label": "Public N8n URL",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "connection"
+              ],
+              "operation": [
+                "createConnection"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "connection-status",
+      "resource": "connection",
+      "operation": "connectionStatus",
+      "title": "Состояние подключения",
+      "summary": "Прочитать сохранённые параметры и состояние подключения.",
+      "status": "implemented",
+      "transports": [
+        "queue"
+      ],
+      "commands": [],
+      "outputs": [
+        "connection_id, name, status, database_id, profile_id, policy_revision, gateway_url, workflow_id"
+      ],
+      "permissions": [
+        "n8n API key с необходимыми правами; для сопряжения — администратор 1С."
+      ],
+      "limitations": [
+        "Состояние подключения не доказывает исполнение команды или запуск опроса 1С."
+      ],
+      "example": "Get Status → проверить paired и адрес шлюза.",
+      "evidence": [
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "Недостаточно прав n8n API; неверное состояние; настройка шлюза завершилась setup_failed."
+      ],
+      "uiName": "Get Status",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "connection"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "createConnection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "renew-pairing",
+      "resource": "connection",
+      "operation": "renewPairing",
+      "title": "Новый код сопряжения",
+      "summary": "Обновить код неиспользованного или отключённого подключения.",
+      "status": "implemented",
+      "transports": [
+        "queue"
+      ],
+      "commands": [],
+      "outputs": [
+        "connection_id, pairing_code, expires_at"
+      ],
+      "permissions": [
+        "n8n API key с необходимыми правами; для сопряжения — администратор 1С."
+      ],
+      "limitations": [
+        "Допускаются состояния pending и disabled; действующее подключение сначала отключить."
+      ],
+      "example": "Disconnect → Renew Pairing Code → сопряжение новой базы.",
+      "evidence": [
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "Недостаточно прав n8n API; неверное состояние; настройка шлюза завершилась setup_failed."
+      ],
+      "uiName": "Renew Pairing Code",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "connection"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "createConnection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "disconnect-connection",
+      "resource": "connection",
+      "operation": "disconnectConnection",
+      "title": "Отключение очереди",
+      "summary": "Отключить ключи сопряжения/обмена и деактивировать gateway.",
+      "status": "implemented",
+      "transports": [
+        "queue"
+      ],
+      "commands": [],
+      "outputs": [
+        "connection_id, status=disabled"
+      ],
+      "permissions": [
+        "n8n API key с необходимыми правами; для сопряжения — администратор 1С."
+      ],
+      "limitations": [
+        "Data Table и накопленные данные не удаляются."
+      ],
+      "example": "Get Status → Disconnect → проверить disabled.",
+      "evidence": [
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "Недостаточно прав n8n API; неверное состояние; настройка шлюза завершилась setup_failed."
+      ],
+      "uiName": "Disconnect",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ],
+              "resource": [
+                "connection"
+              ]
+            },
+            "hide": {
+              "operation": [
+                "createConnection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "get-queue-result",
+      "resource": "queue",
+      "operation": "getResult",
+      "title": "Сохранённый результат команды",
+      "summary": "Получить состояние/результат ранее поставленной команды без создания новой.",
+      "status": "implemented",
+      "transports": [
+        "queue"
+      ],
+      "commands": [],
+      "outputs": [
+        "command_id, status: pending/leased/dead/succeeded/failed",
+        "data либо error при завершении",
+        "Для успешного PDF — binary.data",
+        "_ldo.command_id"
+      ],
+      "permissions": [
+        "Доступ к своему подключению и исходному scope команды."
+      ],
+      "limitations": [
+        "Чтение результата не повторяет запись.",
+        "После timeout первоначальная команда может оставаться в очереди."
+      ],
+      "example": "Wait for Result=false → Wait → Get Result → если pending/leased, повторить только ожидание.",
+      "evidence": [
+        "standalone-020",
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "Результат отсутствует, недоступен или срок хранения истёк."
+      ],
+      "uiName": "Get Result",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "queuedCommandId",
+          "label": "Command ID",
+          "type": "string",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "queue"
+              ],
+              "operation": [
+                "getResult"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "clean-completed-entries",
+      "resource": "queue",
+      "operation": "cleanup",
+      "title": "Очистка завершённых записей",
+      "summary": "Удалить старые завершённые команды и подтверждённые события текущего scope.",
+      "status": "implemented",
+      "transports": [
+        "queue"
+      ],
+      "commands": [],
+      "outputs": [
+        "removed, retention_days"
+      ],
+      "permissions": [
+        "n8n API key с правами изменения Data Tables."
+      ],
+      "limitations": [
+        "Retention 1–365 дней, по умолчанию 30.",
+        "Pending, leased и dead не удаляются; старые policy revisions рассматриваются отдельно.",
+        "Хранение executions n8n и квитанций 1С настраивается отдельно."
+      ],
+      "example": "Schedule Trigger → Clean Completed Entries.",
+      "evidence": [
+        "unf2-server-031",
+        "universal-search-040"
+      ],
+      "errors": [
+        "Недостаточно прав Data Tables или некорректное подключение."
+      ],
+      "uiName": "Clean Completed Entries",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "retentionDays",
+          "label": "Retention (Days)",
+          "type": "number",
+          "required": false,
+          "default": 30,
+          "bounds": {
+            "min": 1,
+            "max": 365
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "queue"
+              ],
+              "operation": [
+                "cleanup"
+              ]
+            }
+          },
+          "transports": [
+            "queue"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "search-documents",
+      "resource": "operation",
+      "operation": "documentSearch",
+      "title": "Поиск документов",
+      "summary": "Найти разрешённые объекты по фильтрам локальной политики без ручного UUID.",
+      "status": "implemented",
+      "transports": [
+        "queue",
+        "direct",
+        "msrv"
+      ],
+      "commands": [
+        "n8n.document.search"
+      ],
+      "outputs": [
+        "Отдельный output item на объект: object.type/id, revision, values",
+        "_ldo.command_id и _ldo.search.has_more/next_cursor"
+      ],
+      "permissions": [
+        "Отдельный search-grant; штатное Чтение и RLS. Запись ссылочного поля не требуется.",
+        "Имена реквизитов задаются только в локальной политике; клиент выбирает опубликованный ID фильтра."
+      ],
+      "limitations": [
+        "Single Match требует ровно один результат; пустой List возвращает ноль items.",
+        "Return All ограничен локальной политикой (не более 200); размер страницы 1–50.",
+        "Курсор связан с профилем, ревизией и фильтрами; политика проверяется при каждой странице.",
+        "Документы: номер и календарная дата/период. Справочники: наименование/код; дополнительные поля (например ИНН) задаются локальным отображением метаданных."
+      ],
+      "example": "Search → Get Fields с выражениями object.type/id из результата.",
+      "evidence": [
+        "universal-search-040"
+      ],
+      "errors": [
+        "access_denied, invalid_filter, filter_not_allowed, search_too_broad, object_not_found, ambiguous_match, cursor_invalid, search_limit_exceeded"
+      ],
+      "uiName": "Search Documents",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "searchObjectType",
+          "label": "Document Type Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentSearch"
+              ]
+            }
+          },
+          "optionsSource": "getSearchDocumentTypes",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "searchFilters",
+          "label": "Filters",
+          "type": "fixedCollection",
+          "required": true,
+          "default": {},
+          "choices": [
+            {
+              "label": "conditions"
+            }
+          ],
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "fields": [
+            {
+              "name": "conditions",
+              "displayName": "Filter",
+              "values": [
+                {
+                  "displayName": "Filter Name or ID",
+                  "name": "field",
+                  "type": "options",
+                  "default": "",
+                  "required": true,
+                  "description": "Choose from the list, or specify an ID using an <a href=\"https://docs.n8n.io/code/expressions/\">expression</a>",
+                  "typeOptions": {
+                    "loadOptionsMethod": "getSearchFilters",
+                    "loadOptionsDependsOn": [
+                      "searchObjectType"
+                    ]
+                  }
+                },
+                {
+                  "displayName": "Match",
+                  "name": "match",
+                  "type": "options",
+                  "default": "exact",
+                  "options": [
+                    {
+                      "name": "Between Dates",
+                      "value": "between"
+                    },
+                    {
+                      "name": "Contains",
+                      "value": "contains"
+                    },
+                    {
+                      "name": "Exact",
+                      "value": "exact"
+                    },
+                    {
+                      "name": "Starts With",
+                      "value": "startsWith"
+                    }
+                  ],
+                  "description": "Only modes permitted by the selected local filter are accepted"
+                },
+                {
+                  "displayName": "Value",
+                  "name": "value",
+                  "type": "string",
+                  "default": "",
+                  "required": true,
+                  "description": "Text, reference ID, or calendar date YYYY-MM-DD; for Between Dates this is the first day"
+                },
+                {
+                  "displayName": "Last Day",
+                  "name": "to",
+                  "type": "string",
+                  "default": "",
+                  "description": "Inclusive last calendar day YYYY-MM-DD for Between Dates"
+                }
+              ]
+            }
+          ],
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "searchResultMode",
+          "label": "Result Mode",
+          "type": "options",
+          "required": false,
+          "default": "list",
+          "choices": [
+            {
+              "value": "list",
+              "label": "List"
+            },
+            {
+              "value": "single",
+              "label": "Single Match"
+            }
+          ],
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "searchReturnAll",
+          "label": "Return All",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentSearch",
+                "catalogSearch"
+              ],
+              "searchResultMode": [
+                "list"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "searchLimit",
+          "label": "Limit",
+          "type": "number",
+          "required": false,
+          "default": 20,
+          "bounds": {
+            "min": 1,
+            "max": 50
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentSearch",
+                "catalogSearch"
+              ],
+              "searchResultMode": [
+                "list"
+              ],
+              "searchReturnAll": [
+                false
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "searchCursor",
+          "label": "Cursor",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentSearch",
+                "catalogSearch"
+              ],
+              "searchResultMode": [
+                "list"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "timeoutSeconds",
+          "label": "Timeout (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 900,
+          "bounds": {
+            "min": 1,
+            "max": 1800
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "pollSeconds",
+          "label": "Poll Interval (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 2,
+          "bounds": {
+            "min": 1,
+            "max": 30
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "search-catalog-items",
+      "resource": "operation",
+      "operation": "catalogSearch",
+      "title": "Поиск элементов справочников",
+      "summary": "Найти разрешённые объекты по фильтрам локальной политики без ручного UUID.",
+      "status": "implemented",
+      "transports": [
+        "queue",
+        "direct",
+        "msrv"
+      ],
+      "commands": [
+        "n8n.catalog.search"
+      ],
+      "outputs": [
+        "Отдельный output item на объект: object.type/id, revision, values",
+        "_ldo.command_id и _ldo.search.has_more/next_cursor"
+      ],
+      "permissions": [
+        "Отдельный search-grant; штатное Чтение и RLS. Запись ссылочного поля не требуется.",
+        "Имена реквизитов задаются только в локальной политике; клиент выбирает опубликованный ID фильтра."
+      ],
+      "limitations": [
+        "Single Match требует ровно один результат; пустой List возвращает ноль items.",
+        "Return All ограничен локальной политикой (не более 200); размер страницы 1–50.",
+        "Курсор связан с профилем, ревизией и фильтрами; политика проверяется при каждой странице.",
+        "Документы: номер и календарная дата/период. Справочники: наименование/код; дополнительные поля (например ИНН) задаются локальным отображением метаданных."
+      ],
+      "example": "Search → Get Fields с выражениями object.type/id из результата.",
+      "evidence": [
+        "universal-search-040"
+      ],
+      "errors": [
+        "access_denied, invalid_filter, filter_not_allowed, search_too_broad, object_not_found, ambiguous_match, cursor_invalid, search_limit_exceeded"
+      ],
+      "uiName": "Search Catalog Items",
+      "parameters": [
+        {
+          "name": "connectionId",
+          "label": "Connection Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "connectionMode": [
+                "queue"
+              ]
+            },
+            "hide": {
+              "resource": [
+                "connection"
+              ]
+            }
+          },
+          "optionsSource": "getConnections",
+          "transports": [
+            "queue"
+          ]
+        },
+        {
+          "name": "searchObjectType",
+          "label": "Catalog Type Name or ID",
+          "type": "options",
+          "required": true,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "catalogSearch"
+              ]
+            }
+          },
+          "optionsSource": "getSearchCatalogTypes",
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "searchFilters",
+          "label": "Filters",
+          "type": "fixedCollection",
+          "required": true,
+          "default": {},
+          "choices": [
+            {
+              "label": "conditions"
+            }
+          ],
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "fields": [
+            {
+              "name": "conditions",
+              "displayName": "Filter",
+              "values": [
+                {
+                  "displayName": "Filter Name or ID",
+                  "name": "field",
+                  "type": "options",
+                  "default": "",
+                  "required": true,
+                  "description": "Choose from the list, or specify an ID using an <a href=\"https://docs.n8n.io/code/expressions/\">expression</a>",
+                  "typeOptions": {
+                    "loadOptionsMethod": "getSearchFilters",
+                    "loadOptionsDependsOn": [
+                      "searchObjectType"
+                    ]
+                  }
+                },
+                {
+                  "displayName": "Match",
+                  "name": "match",
+                  "type": "options",
+                  "default": "exact",
+                  "options": [
+                    {
+                      "name": "Between Dates",
+                      "value": "between"
+                    },
+                    {
+                      "name": "Contains",
+                      "value": "contains"
+                    },
+                    {
+                      "name": "Exact",
+                      "value": "exact"
+                    },
+                    {
+                      "name": "Starts With",
+                      "value": "startsWith"
+                    }
+                  ],
+                  "description": "Only modes permitted by the selected local filter are accepted"
+                },
+                {
+                  "displayName": "Value",
+                  "name": "value",
+                  "type": "string",
+                  "default": "",
+                  "required": true,
+                  "description": "Text, reference ID, or calendar date YYYY-MM-DD; for Between Dates this is the first day"
+                },
+                {
+                  "displayName": "Last Day",
+                  "name": "to",
+                  "type": "string",
+                  "default": "",
+                  "description": "Inclusive last calendar day YYYY-MM-DD for Between Dates"
+                }
+              ]
+            }
+          ],
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "searchResultMode",
+          "label": "Result Mode",
+          "type": "options",
+          "required": false,
+          "default": "list",
+          "choices": [
+            {
+              "value": "list",
+              "label": "List"
+            },
+            {
+              "value": "single",
+              "label": "Single Match"
+            }
+          ],
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentSearch",
+                "catalogSearch"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "searchReturnAll",
+          "label": "Return All",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentSearch",
+                "catalogSearch"
+              ],
+              "searchResultMode": [
+                "list"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "searchLimit",
+          "label": "Limit",
+          "type": "number",
+          "required": false,
+          "default": 20,
+          "bounds": {
+            "min": 1,
+            "max": 50
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentSearch",
+                "catalogSearch"
+              ],
+              "searchResultMode": [
+                "list"
+              ],
+              "searchReturnAll": [
+                false
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "searchCursor",
+          "label": "Cursor",
+          "type": "string",
+          "required": false,
+          "default": "",
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ],
+              "operation": [
+                "documentSearch",
+                "catalogSearch"
+              ],
+              "searchResultMode": [
+                "list"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "timeoutSeconds",
+          "label": "Timeout (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 900,
+          "bounds": {
+            "min": 1,
+            "max": 1800
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        },
+        {
+          "name": "pollSeconds",
+          "label": "Poll Interval (Seconds)",
+          "type": "number",
+          "required": false,
+          "default": 2,
+          "bounds": {
+            "min": 1,
+            "max": 30
+          },
+          "visibility": {
+            "show": {
+              "resource": [
+                "operation"
+              ]
+            }
+          },
+          "transports": [
+            "queue",
+            "direct",
+            "msrv"
+          ]
+        }
+      ]
+    }
+  ]
+}

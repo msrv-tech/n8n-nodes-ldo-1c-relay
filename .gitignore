@@ -5,3 +5,9 @@ dist/
 .npmrc
 .env
 .env.*
+
+# Private integration inputs, snapshots and Python cache
+.runtime/
+*.private.*
+*.local.json
+__pycache__/

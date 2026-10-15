@@ -19,6 +19,12 @@ export interface ObjectType {
 	fields?: Field[];
 	write_fields?: Field[];
 	forms?: ReferenceValue[];
+	search?: {
+		filters: Array<{ id: string; value_type: string; match_modes: string[] }>;
+		max_results: number;
+		max_period_days: number;
+		date_semantics?: string;
+	};
 }
 
 export interface ProcessProfile {

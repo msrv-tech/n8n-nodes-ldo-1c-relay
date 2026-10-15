@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.0 — 2026-10-15
+
+- Add universal Search Documents and Search Catalog Items operations based on locally allowed metadata filters.
+- Return individual items, support Single Match and bounded Return All, and keep cursor context tied to local policy.
+- Add server search-to-read chains and negative permission/filter/cursor scenarios.
+
+
+- Use the documented Data Tables `/rows/delete` endpoint for filtered queue cleanup.
+- Preserve the correlated command ID and normalized failure code for Direct operations with Continue On Fail.
+- Add a reproducible registered-UNF capability suite using the public n8n API and CodexTestBridge, JSON/JUnit reports and durable fixture recovery.
+- Add the operation registry and document-search design; live-test gaps remain explicit.
+
 ## 0.3.0 — 2026-10-14
 
 - Simplify direct credentials to 1C service URL, username and password; discover

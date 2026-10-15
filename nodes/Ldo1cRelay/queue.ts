@@ -51,6 +51,8 @@ const commandTypes = new Set([
 	'document.get',
 	'document.fields.update',
 	'catalog.get',
+	'document.search',
+	'catalog.search',
 	'catalog.fields.update',
 	'reference.search',
 	'document.file.prepare',
@@ -306,7 +308,7 @@ export async function cleanupQueue(context: QueueContext, retentionDays: number)
 	const cutoff = new Date(Date.now() - retentionDays * 86_400_000).toISOString();
 	let removed = 0;
 	for (const status of ['completed', 'acknowledged']) {
-		const result = await tableRequest<QueueRow[]>(context, 'DELETE', '/rows', undefined, {
+		const result = await tableRequest<QueueRow[]>(context, 'DELETE', '/rows/delete', undefined, {
 			filter: JSON.stringify(
 				await filters(context, [
 					{ columnName: 'status', condition: 'eq', value: status },
