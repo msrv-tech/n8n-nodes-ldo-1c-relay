@@ -1,6 +1,6 @@
 # Standalone 1C connections
 
-This guide describes version 0.3.0. Simple standalone connections were introduced in UNF 6.7.1.0; the ordinary UNF 6.7.1.2 build also passed a fresh-instance queue UI read/write test. See the [capabilities registry](capabilities/README.md) for operation details and version-specific evidence.
+This guide applies to node 0.4.0 with LDO core 6.8. Choose an extension build for your 1C configuration and installation environment. See the [public compatibility table](https://ldo.msrv.tech/docs/n8n/compatibility/) and [operation catalog](https://ldo.msrv.tech/docs/n8n/).
 Version 0.2.0 does not include the simple credentials or pairing wizard.
 
 Node version 2 defaults to **Standalone Queue**. It never supplies an MSRV URL,

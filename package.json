@@ -33,6 +33,7 @@
 		"docs:check": "node scripts/capabilities.cjs --check"
 	},
 	"files": [
+		"README.ru.md",
 		"dist",
 		"docs",
 		"examples"

@@ -13,7 +13,8 @@ Trusted Publishing was configured and validated by a successful `0.1.1` release 
 1. Run `npm ci` and `npm run check`.
 2. Update `package.json`, the lockfile, and `CHANGELOG.md`.
    Also update `docs/capabilities/release.json` with the exact version, required
-   core, date and concise user-facing changes. Every new operation or feature
+   core, date and concise user-facing changes. Update both `README.md` and
+   `README.ru.md`, including their current node/core pair. Every new operation or feature
    needs `introducedIn.nodeVersion` and `introducedIn.coreVersion` in the registry;
    preserve these values on later releases. Run `npm run docs:build`.
 3. Commit and push to `main`.

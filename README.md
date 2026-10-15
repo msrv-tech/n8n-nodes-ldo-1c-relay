@@ -1,83 +1,76 @@
 # n8n-nodes-ldo-1c-relay
 
-**Version 0.4.0** adds universal metadata-driven document/catalog search and queue cleanup/error fixes. Use an extension based on **LDO core 6.8**. [Public documentation](https://ldo.msrv.tech/docs/n8n/) describes operations and core/node compatibility.
+**English** · [Русский](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/blob/main/README.ru.md)
 
-Connect a 1C database to n8n using your own **standalone queue**, **direct HTTP**, or an explicitly enrolled **MSRV Relay service**. Node version 2 defaults to the standalone queue: the separately installed extension polls your n8n, so the database does not need an inbound web publication. Standalone operation does not contact MSRV.
+Connect 1C to n8n using your own queue, a published 1C HTTP service, or an enrolled MSRV service. Read and find documents and catalog items, update permitted fields, retrieve PDFs, and automate approval events and external processes.
 
-**Release 0.3.0** simplifies standalone setup: direct HTTP uses URL/user/password, and queues connect using one pairing code. Version 0.2.0 introduced the original standalone transports. [Standalone connection setup](docs/standalone.md) documents their requirements and limitations. Existing version 1 workflows retain their Relay transport; npm 0.1.1 and earlier remain Relay-only.
+**Current release: [npm 0.4.0](https://www.npmjs.com/package/n8n-nodes-ldo-1c-relay/v/0.4.0) · LDO core 6.8 · command contract 1.0.** Version 0.4.0 adds universal document/catalog search by metadata. The separately distributed LDO extension is required; choose a build for your 1C configuration and a compatible core version.
 
-**Publication:** [version 0.4.0 is available on npm](https://www.npmjs.com/package/n8n-nodes-ldo-1c-relay/v/0.4.0), published through [GitHub Actions](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/actions/runs/38673148847) with npm provenance. The official published-package scanner passed on 2026-10-15. Use **LDO core 6.8** for this release.
+[Documentation and operation catalog (Russian)](https://ldo.msrv.tech/docs/n8n/) · [Compatibility](https://ldo.msrv.tech/docs/n8n/compatibility/) · [Release history](https://ldo.msrv.tech/docs/n8n/updates/) · [Get the 1C extension](https://gitsell.ru/msrv-tech/ldo)
 
-**Verification status:** this node has not been verified by n8n. The earlier Relay submission passed automated review on 2026-10-13. An English demonstration of version 0.3.0 was submitted on 2026-10-14; the Creator Portal now shows **Manual Review: Under Review**. Installing through the n8n Cloud node panel requires verification.
+## Choose a connection
 
-[n8n](https://n8n.io/) is a workflow automation platform.
+| Transport | When to use it | Connection settings |
+| --- | --- | --- |
+| **Your own queue** | Your 1C database is not published. The extension polls your n8n using outgoing requests. | n8n URL and API key in the Queue credential; a one-time pairing code in 1C. |
+| **Direct HTTP** | The extension's `ldo_n8n` HTTP service is published and reachable from n8n. | Service URL, 1C username and password in the Direct credential. |
+| **MSRV Relay** | You have enrolled in a managed MSRV service. | Service address and scoped credentials supplied for that connection. |
 
-## Installation
+**Your own queue and Direct do not contact MSRV or require MSRV activation.** MSRV services are provided separately to enrolled customers. Installing this public node does not grant access to them.
 
-For local development, see [Development](#development). Install `n8n-nodes-ldo-1c-relay` through **Settings → Community Nodes** on a self-hosted instance, following the [n8n installation guide](https://docs.n8n.io/integrations/community-nodes/installation-and-management).
+The current node interface defaults to your own queue. Existing version 1 workflows retain their Relay transport. See the [English standalone setup guide](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/blob/main/docs/standalone.md) or [MSRV connection guide](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/blob/main/docs/connection.md).
 
-The extension is installed separately. Follow [Standalone connection setup](docs/standalone.md) for your own queue or direct HTTP, or [MSRV connection setup](docs/connection.md) for an enrolled Relay service.
+## Installation and first connection
 
-## Credentials
+1. In self-hosted n8n, open **Settings → Community nodes → Install** and enter `n8n-nodes-ldo-1c-relay`. See [n8n's installation guide](https://docs.n8n.io/integrations/community-nodes/installation-and-management/).
+2. Install the LDO extension separately in 1C. Select the appropriate configuration and installation environment; the core is not a universal installable CFE.
+3. Choose the transport and create its credential:
+   - **LDO 1C Standalone Queue API:** your n8n root URL and API key. Run **Create Connection**, then paste its one-time code into the extension's standalone **Queue** settings. The gateway address is carried inside the code; the n8n API key is not sent to 1C.
+   - **LDO 1C Direct API:** published service URL, 1C username and password. Enable direct access in the extension; its access profile is discovered automatically.
+   - **LDO Relay API:** explicitly enrolled MSRV service URL, scoped Relay token and the supplied database/profile/policy identifiers.
+4. Permit the required objects and actions in 1C. For a queue, ensure scheduled polling works. Execute **Get Capabilities**, then your first permitted operation.
 
-Choose the credential for the selected transport:
+Credential secrets are password fields stored in encrypted n8n credentials. The node does not read environment variables or local files.
 
-- **LDO 1C Standalone Queue API**: your n8n URL and API key; create a connection and pair it with 1C using a one-time code.
-- **LDO 1C Direct API**: your published 1C service URL, native username and password; the access profile is discovered automatically.
-- **LDO Relay API**: an explicitly enrolled MSRV service URL, scoped Relay token and its database/profile/policy identifiers.
+Publishing on npm and verification by n8n are separate stages. npm availability does not imply availability in the n8n Cloud node panel. The demonstration of version 0.3.0 was submitted for manual review on 2026-10-14; see [verification information](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/blob/main/docs/verification.md).
 
-Sensitive values are password fields stored in encrypted n8n credentials. The node does not read environment variables or local files.
+## What the node can do
 
-The credential's **Minimum Wait (Seconds)** defaults to 900 for a database that polls every 15 minutes. Lower it only when the database polling schedule supports shorter waits. Each operation's timeout is at least this minimum.
+| Resource | Actions |
+| --- | --- |
+| **1C Operation** | Get capabilities; search documents and catalog items; get/update their fields; find reference values and update a reference field; prepare a document PDF; start/get/transition/update/cancel an external process. |
+| **Event** | Lease approval-started, document-approved and document-rejected events. |
+| **Delivery** | Acknowledge an event, schedule a retry, or confirm PDF delivery through MSRV Relay. |
+| **Connection** | Create a queue connection, check status, renew its pairing code, disconnect. |
+| **Queue** | Retrieve a retained command result and clean old completed entries. |
 
-## Operations
+The node can also be connected as a tool to an **AI Agent**. The agent uses the same credentials and local permissions; it does not gain arbitrary access to 1C.
 
-The [capabilities registry](docs/capabilities/README.md) contains every action, its actual UI parameters, results, transport support, limitations, and version-specific validation evidence (currently in Russian). [Portable JSON](docs/capabilities/catalog.json) is generated from the same registry and node UI metadata. See [maintenance and knowledge-base structure](docs/knowledge-base.md).
+Types, fields, print forms, process profiles and transitions come from the connected database's **capabilities**. Names and business values remain in their original language. A search result can feed the next workflow step, without manually copying an object ID. Do not automatically select the first result of an ambiguous search.
 
-| Resource     | Operations                                                                                                                                                                                           |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1C Operation | Get capabilities; get/update document fields; get/update catalog fields; search documents/catalog items; search references; update a reference field; prepare a document PDF; start/get/transition/update/cancel an external process |
-| Event        | Lease approval-started, document-approved, or document-rejected events                                                                                                                               |
-| Delivery     | Acknowledge an event; confirm PDF delivery and acknowledge its event; schedule an event retry                                                                                                        |
-| Connection   | Create connection; get status; renew pairing code; disconnect |
-| Queue        | Get a retained standalone command result; clean old completed entries                                                                                                                              |
-
-Event and Delivery resources apply to queue transports. Direct HTTP receives events through a separately configured outgoing webhook. PDF delivery confirmation through Relay applies only to MSRV; standalone PDF commands return the binary file with their result.
-
-Types, fields, print forms, process profiles, transitions, and reference values are loaded from the capabilities published by the local database policy. Business names and values are returned in their original language.
-
-Updates require the expected object revision. References can be supplied as an ID, resolved with a live search that must return exactly one match, or selected from the bounded policy cache. The node does not execute arbitrary BSL, SQL, or HTTP requests against the database.
-
-External process fields belong to the process instance. Updating a process does not update the source document fields.
+[Browse all operations](https://ldo.msrv.tech/docs/n8n/) · [Search guide](https://ldo.msrv.tech/docs/n8n/search/) · [Additional capabilities](https://ldo.msrv.tech/docs/n8n/features/)
 
 ## Example workflows
 
-- [Get capabilities](examples/get-capabilities.json): Manual Trigger → Get Capabilities. Select your standalone queue credential, or explicitly change the transport and select its credential.
-- [Create queue connection](examples/create-queue-connection.json): create and activate a connection, then paste its pairing code into 1C.
-- [Queue with Wait](examples/queue-with-wait.json): submit without waiting, persist the wait and retrieve the retained result.
-- Event automation: Schedule Trigger → Event → your business logic → Delivery: Acknowledge Event. Preserve `_ldo.event_id` and, for a standalone queue, `_ldo.lease_token`.
-- Standalone PDF delivery: Prepare Document PDF → your email/storage node, using binary property `data`. For MSRV Relay, add Delivery: Confirm PDF Delivery and preserve `_ldo.event_id`, `_ldo.file_id`, and `_ldo.sha256` through the destination node.
+- [Get capabilities](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/blob/main/examples/get-capabilities.json): Manual Trigger → Get Capabilities.
+- [Create a queue connection](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/blob/main/examples/create-queue-connection.json): create the gateway and pair it with 1C.
+- Search → Get Fields: find the document or catalog item by its permitted attributes, then pass the returned object type and ID using n8n expressions.
+- [Queue with Wait](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/blob/main/examples/queue-with-wait.json): submit without waiting, persist the wait, retrieve the result.
+- Approval events: Schedule Trigger → Event → your business logic → Delivery: Acknowledge Event. Preserve `_ldo.event_id` and, for your own queue, `_ldo.lease_token`.
+- PDF delivery: Prepare Document PDF → email/storage node with binary property `data`. Acknowledge delivery only after the destination accepts the file. For MSRV Relay, use Confirm PDF Delivery and preserve `_ldo.event_id`, `_ldo.file_id` and `_ldo.sha256`.
 
-Confirm delivery only after the destination accepts the file. If delivery fails, schedule a retry rather than acknowledging the event. PDF bytes are checked against size, PDF header, and SHA-256 before being returned as n8n binary data.
+## Compatibility and limits
 
-## Compatibility and limitations
+- **Node 0.4.0 pairs with LDO core 6.8.** Core means the first two components of the extension version. Adaptations for different 1C configurations are distributed separately. See the [supported pairs](https://ldo.msrv.tech/docs/n8n/compatibility/) and [component updates](https://ldo.msrv.tech/docs/n8n/updates/).
+- Requires Node.js **22.22.0+**, command contract **1.0**, and a self-hosted n8n compatible with the package. Your own queue also requires n8n Public API/Data Tables and a gateway reachable from the 1C server. MSRV operations require support by the connected service.
+- Event/Delivery polling uses queues. Direct HTTP can receive business events through a separately configured outgoing webhook.
+- Updates require the expected object revision and local write permission. Updating external process fields does not update the source document. Arbitrary BSL, SQL and HTTP execution against 1C are not supported.
+- Creating new documents/catalog items, posting/unposting/deleting documents and universal tabular-section editing are not supported.
+- Queue timing depends on 1C polling. **Minimum Wait (Seconds)** defaults to 900; lower it only when the polling schedule supports it. Operation timeouts can reach 1800 seconds; configure n8n execution limits accordingly.
+- A timed-out command may still be queued. Retrieve its retained result or retry the **same Command ID and original payload**. A new ID represents a new operation. Delivery is at least once; 1C write receipts prevent the same write being applied again.
+- Standalone PDF results are limited to **7 MiB** and occupy Data Table space. Configure retention for queue data, n8n execution data and files.
 
-- Simple connection setup tested in self-hosted n8n 2.36.9 against registered UNF with LDO 6.7.1.0: actual gateway creation, native pairing, queued read/write, automatic policy changes, old-result lookup and restart. Earlier 0.2.0 transport tests included real PDF, event, persisted Wait and AI tool workflows. Queue results survived a restart and eight competing leases produced one owner. n8n Cloud is not validated.
-- Earlier Relay releases were tested in n8n 2.36.9 and 2.42.7, including workflow operations against LDO 6.5.1.0. Version 1 workflows retain that transport.
-- Node.js 22.22.0 or later. The tested `n8n-workflow` version is recorded in `package-lock.json`; host compatibility is declared in `peerDependencies`.
-- Requires command contract `1.0` and an extension compatible with the selected transport and operation. Available operations depend on the configuration and local policy.
-- An operation may wait up to 1800 seconds. Your n8n execution timeout must permit the polling schedule. PDF preparation may wait separately for the result and the file.
-- After a timeout, the original command may still be queued. In standalone mode, retrieve its result or reuse its Command ID and original payload. A new Command ID represents a new operation.
-- Standalone PDFs are limited to 7 MiB and consume Data Table space when queued. Delivery is at least once; simultaneous submissions can create duplicate transport rows, while 1C receipts prevent repeating the same write.
-- Configure execution-data retention in your n8n instance for business data and PDF files.
-
-## Reproducible capability tests
-
-The [server suite](test/integration/README.md) executes installed nodes through the n8n Public API and authenticated webhooks. CodexTestBridge prepares disposable UNF fixtures and independently verifies their effects. The [coverage matrix](test/integration/coverage.md) maps every action and feature; CI rejects missing mappings.
-
-The [2026-10-14 full report](docs/capabilities/evidence/unf2-server-2026-10-14.md) records 30 passed, 4 transport-inapplicable cases and 1 live MSRV case not run. It used unreleased node 0.3.1 and ordinary UNF 6.7.1.3. These records retain their original pre-release versions; the fixes are included in 0.4.0. Fixture settings and routing were restored and owned test resources removed.
-
-## Development
+## Development and release
 
 ```sh
 npm ci
@@ -85,16 +78,12 @@ npm run check
 npm run dev
 ```
 
-Scaffolded with the official `n8n-node` tool. The programmatic node is necessary because operations require dependent requests: enqueue a command, poll its correlated result, acknowledge it, and optionally retrieve and verify a PDF.
+The programmatic node coordinates dependent requests: enqueue, poll a correlated result, acknowledge it, and optionally retrieve and verify a PDF. Scaffolded with the official `n8n-node` tool.
 
-Tests use synthetic responses and never contact a database or Relay service. They cover authentication, contracts, options, reference selection, document/catalog writes, processes, PDF verification, acknowledgements, and retries.
+`npm run check` covers the registry, lint, build and synthetic-response tests. The separate [server suite](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/blob/main/test/integration/README.md) checks installed nodes against disposable test data. Developer reports and the [capability registry](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/blob/main/docs/capabilities/README.md) record their original versions and scope.
 
-## Release
-
-For standalone queue and direct credentials, see [Standalone connection setup](docs/standalone.md).
-
-See [Release and verification](docs/release.md) and the [verification submission details](docs/verification.md). GitHub Actions builds and tests the package and publishes it with npm provenance. Publishing and n8n verification are separate stages.
+See [Release and verification](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/blob/main/docs/release.md). Maintain both README languages when changing installation, transports, compatibility or available operations.
 
 ## License
 
-This repository is licensed under [MIT](LICENSE). This covers the n8n node; the separately distributed extension and Relay service have their own terms.
+[MIT](https://github.com/msrv-tech/n8n-nodes-ldo-1c-relay/blob/main/LICENSE) covers this n8n node. The separately distributed 1C extension and MSRV services have their own terms.
