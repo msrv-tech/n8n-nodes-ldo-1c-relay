@@ -74,7 +74,7 @@ Types, fields, print forms, process profiles and transitions come from the conne
 
 [![Infostart](https://infostart.ru/bitrix/templates/sandbox_empty/assets/tpl/abo/img/logo.svg)](https://infostart.ru/1c/articles/2818598/)
 
-[Self-hosted queue and direct HTTP: architecture and node capabilities (Russian)](https://infostart.ru/1c/articles/2818598/).
+[Ready-made 1C actions in n8n: node capabilities and workflow examples (Russian)](https://infostart.ru/1c/articles/2818598/).
 The article is currently a draft and will become public after publication on Infostart.
 
 ## Development and release

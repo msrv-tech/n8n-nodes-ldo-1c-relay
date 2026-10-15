@@ -74,7 +74,7 @@
 
 [![Инфостарт](https://infostart.ru/bitrix/templates/sandbox_empty/assets/tpl/abo/img/logo.svg)](https://infostart.ru/1c/articles/2818598/)
 
-[Обмен с закрытой базой через очередь: устройство self-hosted ноды](https://infostart.ru/1c/articles/2818598/).
+[Хватит собирать HTTP-запросы: у 1С появилась нода для n8n](https://infostart.ru/1c/articles/2818598/).
 Пока материал сохранён как черновик; общедоступным он станет после публикации на Инфостарте.
 
 ## Разработка и выпуск
