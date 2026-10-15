@@ -48,6 +48,37 @@ assert(ui && Array.isArray(ui.properties), 'Node UI description not found');
 assert.equal(registry.schemaVersion, 1);
 assert.equal(registry.packageVersion, pkg.version, 'Update registry for the new package version');
 assert(/^\d+\.\d+$/.test(registry.coreVersion), 'Record the compatible LDO core release');
+const release = JSON.parse(fs.readFileSync(path.join(dir, 'release.json'), 'utf8'));
+assert.equal(release.schemaVersion, 1);
+assert.equal(release.version, pkg.version, 'Update release notes for the new npm version');
+assert.equal(release.coreVersion, registry.coreVersion);
+assert(
+	release.compatibleCoreVersions?.includes(registry.coreVersion),
+	'List explicitly compatible published cores',
+);
+assert(release.compatibleCoreVersions.every((v) => /^\d+\.\d+$/.test(v)));
+assert(/^\d{4}-\d{2}-\d{2}$/.test(release.date));
+assert(release.summary && release.changes.length, 'Write user-facing release notes');
+const versionAtMost = (value, maximum) => {
+	const left = value.split('.').map(Number);
+	const right = maximum.split('.').map(Number);
+	for (let i = 0; i < left.length; i++) {
+		if (left[i] !== right[i]) return left[i] < right[i];
+	}
+	return true;
+};
+for (const item of [...registry.operations, ...registry.features]) {
+	const since = item.introducedIn;
+	assert(
+		since && /^\d+\.\d+\.\d+$/.test(since.nodeVersion) && /^\d+\.\d+$/.test(since.coreVersion),
+		`Record introduction versions: ${item.id}`,
+	);
+	assert(versionAtMost(since.nodeVersion, pkg.version), `Future node requirement: ${item.id}`);
+	assert(
+		versionAtMost(since.coreVersion, registry.coreVersion),
+		`Future core requirement: ${item.id}`,
+	);
+}
 assert.deepEqual(registry.nodeVersions, ui.version);
 const ids = new Set();
 for (const item of [
@@ -63,7 +94,10 @@ for (const item of [
 const evidenceIds = new Set(registry.evidence.map((e) => e.id));
 for (const gap of registry.gaps) {
 	assert(['not-implemented', 'needs-validation', 'validated'].includes(gap.status));
-	assert((gap.evidence || []).every((id) => evidenceIds.has(id)), `Invalid evidence: ${gap.id}`);
+	assert(
+		(gap.evidence || []).every((id) => evidenceIds.has(id)),
+		`Invalid evidence: ${gap.id}`,
+	);
 	if (gap.status === 'validated')
 		assert(gap.evidence?.length, `Validated scenario requires evidence: ${gap.id}`);
 }
@@ -177,7 +211,9 @@ for (const op of registry.operations) {
 	for (const p of op.parameters) {
 		const notes = [
 			p.condition ? `Value Source=${p.condition.join('/')}` : '',
-			p.visibility?.show?.searchResultMode ? `Result Mode=${p.visibility.show.searchResultMode.join('/')}` : '',
+			p.visibility?.show?.searchResultMode
+				? `Result Mode=${p.visibility.show.searchResultMode.join('/')}`
+				: '',
 			p.visibility?.hide?.searchReturnAll ? 'При выключенном Return All' : '',
 			p.choices ? p.choices.map((c) => `${c.label}: ${c.value}`).join('; ') : '',
 			p.bounds

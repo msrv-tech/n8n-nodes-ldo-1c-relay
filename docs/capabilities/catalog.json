@@ -103,7 +103,11 @@
         "standalone-020",
         "unf2-server-031",
         "universal-search-040"
-      ]
+      ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      }
     },
     {
       "id": "dynamic-policy",
@@ -116,7 +120,11 @@
         "unf2-ui-030",
         "unf2-server-031",
         "universal-search-040"
-      ]
+      ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      }
     },
     {
       "id": "ai-tool",
@@ -130,7 +138,11 @@
         "standalone-020",
         "unf2-server-031",
         "universal-search-040"
-      ]
+      ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      }
     },
     {
       "id": "wait-recovery",
@@ -143,7 +155,11 @@
         "standalone-020",
         "unf2-server-031",
         "universal-search-040"
-      ]
+      ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      }
     },
     {
       "id": "write-receipts",
@@ -155,7 +171,11 @@
       "evidence": [
         "unf2-server-031",
         "universal-search-040"
-      ]
+      ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      }
     },
     {
       "id": "extension-distribution",
@@ -168,7 +188,11 @@
         "unf2-ui-030",
         "unf2-server-031",
         "universal-search-040"
-      ]
+      ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      }
     }
   ],
   "gaps": [
@@ -270,6 +294,10 @@
       "errors": [
         "Профиль отключён, операция или объект не разрешены локальной политикой; недостаточно штатных прав 1С."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Get Capabilities",
       "parameters": [
         {
@@ -445,6 +473,10 @@
         "access_denied / field_not_allowed: объект или поле не разрешены.",
         "object_not_found: объект отсутствует либо недоступен текущему пользователю."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Get Document Fields",
       "parameters": [
         {
@@ -692,6 +724,10 @@
         "field_value_invalid: значение не соответствует разрешённому типу.",
         "document_not_editable: документ проведён."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Update Document Fields",
       "parameters": [
         {
@@ -951,6 +987,10 @@
         "access_denied / field_not_allowed: объект или поле не разрешены.",
         "object_not_found: объект отсутствует либо недоступен текущему пользователю."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Get Catalog Fields",
       "parameters": [
         {
@@ -1191,6 +1231,10 @@
         "revision_conflict: документ изменился после чтения; прочитайте его снова и пересмотрите изменение.",
         "field_value_invalid: значение не соответствует разрешённому типу."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Update Catalog Fields",
       "parameters": [
         {
@@ -1451,6 +1495,10 @@
       "errors": [
         "Профиль отключён, операция или объект не разрешены локальной политикой; недостаточно штатных прав 1С."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Search Reference Values",
       "parameters": [
         {
@@ -1722,6 +1770,10 @@
         "field_value_invalid: значение не соответствует разрешённому типу.",
         "Ноль или несколько совпадений; выбранное значение отсутствует в текущем кэше."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Update Reference Field",
       "parameters": [
         {
@@ -2045,6 +2097,10 @@
       "errors": [
         "Форма не разрешена; устарела версия или согласованный цикл; неверный PDF/хэш; превышен лимит."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Prepare Document PDF",
       "parameters": [
         {
@@ -2307,6 +2363,10 @@
       "errors": [
         "Профиль, переход или поле недоступны; версия не совпадает; процесс отсутствует или неактивен."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Start External Process",
       "parameters": [
         {
@@ -2547,6 +2607,10 @@
       "errors": [
         "Профиль, переход или поле недоступны; версия не совпадает; процесс отсутствует или неактивен."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Get External Process",
       "parameters": [
         {
@@ -2742,6 +2806,10 @@
       "errors": [
         "Профиль, переход или поле недоступны; версия не совпадает; процесс отсутствует или неактивен."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Transition External Process",
       "parameters": [
         {
@@ -3035,6 +3103,10 @@
       "errors": [
         "Профиль, переход или поле недоступны; версия не совпадает; процесс отсутствует или неактивен."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Update External Process Fields",
       "parameters": [
         {
@@ -3304,6 +3376,10 @@
       "errors": [
         "Профиль, переход или поле недоступны; версия не совпадает; процесс отсутствует или неактивен."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Cancel External Process",
       "parameters": [
         {
@@ -3523,6 +3599,10 @@
       "errors": [
         "События и подтверждения очереди недоступны в прямом HTTP."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Lease Events",
       "parameters": [
         {
@@ -3637,6 +3717,10 @@
       "errors": [
         "Устаревшая аренда или событие недоступно."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Acknowledge Event",
       "parameters": [
         {
@@ -3730,6 +3814,10 @@
       "errors": [
         "Некорректный ID/хэш; файл или событие недоступны; standalone/direct отклоняются."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Confirm PDF Delivery",
       "parameters": [
         {
@@ -3823,6 +3911,10 @@
       "errors": [
         "Устаревшая аренда или событие недоступно."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Retry Event",
       "parameters": [
         {
@@ -3967,6 +4059,10 @@
       "errors": [
         "Недостаточно прав n8n API; неверное состояние; настройка шлюза завершилась setup_failed."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Create Connection",
       "parameters": [
         {
@@ -4039,6 +4135,10 @@
       "errors": [
         "Недостаточно прав n8n API; неверное состояние; настройка шлюза завершилась setup_failed."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Get Status",
       "parameters": [
         {
@@ -4097,6 +4197,10 @@
       "errors": [
         "Недостаточно прав n8n API; неверное состояние; настройка шлюза завершилась setup_failed."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Renew Pairing Code",
       "parameters": [
         {
@@ -4155,6 +4259,10 @@
       "errors": [
         "Недостаточно прав n8n API; неверное состояние; настройка шлюза завершилась setup_failed."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Disconnect",
       "parameters": [
         {
@@ -4218,6 +4326,10 @@
       "errors": [
         "Результат отсутствует, недоступен или срок хранения истёк."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Get Result",
       "parameters": [
         {
@@ -4295,6 +4407,10 @@
       "errors": [
         "Недостаточно прав Data Tables или некорректное подключение."
       ],
+      "introducedIn": {
+        "nodeVersion": "0.3.0",
+        "coreVersion": "6.7"
+      },
       "uiName": "Clean Completed Entries",
       "parameters": [
         {
@@ -4382,6 +4498,10 @@
       "errors": [
         "access_denied, invalid_filter, filter_not_allowed, search_too_broad, object_not_found, ambiguous_match, cursor_invalid, search_limit_exceeded"
       ],
+      "introducedIn": {
+        "nodeVersion": "0.4.0",
+        "coreVersion": "6.8"
+      },
       "uiName": "Search Documents",
       "parameters": [
         {
@@ -4722,6 +4842,10 @@
       "errors": [
         "access_denied, invalid_filter, filter_not_allowed, search_too_broad, object_not_found, ambiguous_match, cursor_invalid, search_limit_exceeded"
       ],
+      "introducedIn": {
+        "nodeVersion": "0.4.0",
+        "coreVersion": "6.8"
+      },
       "uiName": "Search Catalog Items",
       "parameters": [
         {

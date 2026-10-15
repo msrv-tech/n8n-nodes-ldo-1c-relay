@@ -12,6 +12,10 @@ Trusted Publishing was configured and validated by a successful `0.1.1` release 
 
 1. Run `npm ci` and `npm run check`.
 2. Update `package.json`, the lockfile, and `CHANGELOG.md`.
+   Also update `docs/capabilities/release.json` with the exact version, required
+   core, date and concise user-facing changes. Every new operation or feature
+   needs `introducedIn.nodeVersion` and `introducedIn.coreVersion` in the registry;
+   preserve these values on later releases. Run `npm run docs:build`.
 3. Commit and push to `main`.
 4. Push a tag matching the package version, such as `v0.1.0`. The workflow checks the version, runs all checks, and executes `npm publish --provenance --access public`.
 5. Confirm the workflow and npm publication succeeded. Update the README status only after confirmation.
@@ -20,7 +24,23 @@ If authentication fails, correct the npm configuration and rerun the existing re
 
 After publication, run `npx @n8n/scan-community-package@stable n8n-nodes-ldo-1c-relay@0.1.0` and confirm that it reports success. This checks registry provenance as well as the attested source and published JavaScript. Local static analysis alone does not verify registry provenance.
 
-Do not use `npm run release` to publish from a local machine. The CLI script comes from the scaffold; the documented publication path is the tag-triggered workflow.
+Complete the release from the release PC with the local LDO documentation publisher:
+
+```bash
+bash /home/alex/bsl/ldo/cloud/landing-tools/publish-node-knowledge.sh --publish
+```
+
+It reads the published npm package, checks explicit compatibility against CORE
+release tags, then updates HTML, Markdown, JSON and the user-facing release history
+in one delivery. The command commits the generated snapshot and deploys only the
+website to the LAN host. A missing compatible core or release record stops the
+update and preserves the previous site. Run without `--publish` for a preview.
+The wrapper creates an ignored local Python environment and installs its dependencies.
+No additional GitHub Actions, cron job, npm token or cross-repository secret is used
+for website publication. The existing npm Trusted Publishing workflow is unchanged.
+
+Updating public documentation does not upgrade managed MSRV instances or imply
+n8n verification. See the LDO `docs/node-knowledge-publication.md` runbook.
 
 ## Submit for verification
 

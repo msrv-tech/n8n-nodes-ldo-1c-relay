@@ -95,7 +95,11 @@
 			"summary": "Отдельная служебная нода POST 1c-queue для pair/sync/poll/result/event. Возвращает ответ напрямую, без бизнес-executions для опроса. Создаётся Create Connection.",
 			"limitations": "Не является триггером бизнес-событий. Активность workflow не доказывает работу регламентного задания 1С.",
 			"source": "../../nodes/Ldo1cQueueTrigger/Ldo1cQueueTrigger.node.ts",
-			"evidence": ["unf2-ui-030", "standalone-020", "unf2-server-031", "universal-search-040"]
+			"evidence": ["unf2-ui-030", "standalone-020", "unf2-server-031", "universal-search-040"],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "dynamic-policy",
@@ -104,7 +108,11 @@
 			"summary": "Типы объектов, поля, печатные формы и процессы выбираются из capabilities конкретной базы. Изменения политики своей очереди синхронизируются опросом.",
 			"limitations": "Локальная политика, native permissions/RLS и ревизия повторно проверяются в 1С; capabilities не выдаёт новые права.",
 			"source": "../standalone.md",
-			"evidence": ["unf2-ui-030", "unf2-server-031", "universal-search-040"]
+			"evidence": ["unf2-ui-030", "unf2-server-031", "universal-search-040"],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "ai-tool",
@@ -113,7 +121,16 @@
 			"summary": "Основная нода объявлена usableAsTool=true; разрешённую операцию можно подключить к AI Agent.",
 			"limitations": "Не включает модель и не даёт произвольный доступ к 1С. Gateway инструментом агента не является.",
 			"source": "../../nodes/Ldo1cRelay/Ldo1cRelay.node.ts",
-			"evidence": ["direct-review-030", "standalone-020", "unf2-server-031", "universal-search-040"]
+			"evidence": [
+				"direct-review-030",
+				"standalone-020",
+				"unf2-server-031",
+				"universal-search-040"
+			],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "wait-recovery",
@@ -122,7 +139,11 @@
 			"summary": "Timeout 1–1800 секунд; Poll Interval 1–30. Для очереди эффективный timeout не меньше Minimum Wait credential (по умолчанию 900). Можно использовать Wait/Get Result.",
 			"limitations": "Синхронное ожидание занимает worker. Command ID + исходный payload восстанавливают результат; новый ID — новая операция. Для составного Update Reference Field отдельные ограничения.",
 			"source": "../standalone.md#waiting-and-recovery",
-			"evidence": ["standalone-020", "unf2-server-031", "universal-search-040"]
+			"evidence": ["standalone-020", "unf2-server-031", "universal-search-040"],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "write-receipts",
@@ -131,7 +152,11 @@
 			"summary": "Expected revision защищает от параллельных изменений; квитанции 1С сохраняют результат вместе с записью. Точный повтор не применяет запись второй раз.",
 			"limitations": "Доставка at least once; транспортные дубли возможны. Иной payload с тем же ID отклоняется. После result_expired запись не повторяется.",
 			"source": "../standalone.md#waiting-and-recovery",
-			"evidence": ["unf2-server-031", "universal-search-040"]
+			"evidence": ["unf2-server-031", "universal-search-040"],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "extension-distribution",
@@ -140,7 +165,11 @@
 			"summary": "npm содержит ноду; CFE устанавливается отдельно для конкретной конфигурации и среды.",
 			"limitations": "Standalone внедрён в УНФ с 6.7.1.0; обычная сборка содержит native poller. Для Fresh требуется штатный механизм расписания сервиса; наличие кода CORE не подтверждает совместимость других конфигураций.",
 			"source": "../standalone.md",
-			"evidence": ["unf2-ui-030", "unf2-server-031", "universal-search-040"]
+			"evidence": ["unf2-ui-030", "unf2-server-031", "universal-search-040"],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		}
 	],
 	"gaps": [
@@ -222,7 +251,11 @@
 			"evidence": ["unf2-ui-030", "standalone-020", "unf2-server-031", "universal-search-040"],
 			"errors": [
 				"Профиль отключён, операция или объект не разрешены локальной политикой; недостаточно штатных прав 1С."
-			]
+			],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "get-document-fields",
@@ -257,7 +290,11 @@
 			"errors": [
 				"access_denied / field_not_allowed: объект или поле не разрешены.",
 				"object_not_found: объект отсутствует либо недоступен текущему пользователю."
-			]
+			],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "update-document-fields",
@@ -294,7 +331,11 @@
 				"revision_conflict: документ изменился после чтения; прочитайте его снова и пересмотрите изменение.",
 				"field_value_invalid: значение не соответствует разрешённому типу.",
 				"document_not_editable: документ проведён."
-			]
+			],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "get-catalog-fields",
@@ -316,7 +357,11 @@
 			"errors": [
 				"access_denied / field_not_allowed: объект или поле не разрешены.",
 				"object_not_found: объект отсутствует либо недоступен текущему пользователю."
-			]
+			],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "update-catalog-fields",
@@ -340,7 +385,11 @@
 				"object_not_found: объект отсутствует либо недоступен текущему пользователю.",
 				"revision_conflict: документ изменился после чтения; прочитайте его снова и пересмотрите изменение.",
 				"field_value_invalid: значение не соответствует разрешённому типу."
-			]
+			],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "search-reference-values",
@@ -368,7 +417,11 @@
 			"evidence": ["unf2-server-031", "universal-search-040"],
 			"errors": [
 				"Профиль отключён, операция или объект не разрешены локальной политикой; недостаточно штатных прав 1С."
-			]
+			],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "update-reference-field",
@@ -404,7 +457,11 @@
 				"revision_conflict: документ изменился после чтения; прочитайте его снова и пересмотрите изменение.",
 				"field_value_invalid: значение не соответствует разрешённому типу.",
 				"Ноль или несколько совпадений; выбранное значение отсутствует в текущем кэше."
-			]
+			],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "prepare-document-pdf",
@@ -432,7 +489,11 @@
 			"evidence": ["standalone-020", "unf2-server-031", "universal-search-040"],
 			"errors": [
 				"Форма не разрешена; устарела версия или согласованный цикл; неверный PDF/хэш; превышен лимит."
-			]
+			],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "start-external-process",
@@ -460,7 +521,11 @@
 			"evidence": ["relay-010", "unf2-server-031", "universal-search-040"],
 			"errors": [
 				"Профиль, переход или поле недоступны; версия не совпадает; процесс отсутствует или неактивен."
-			]
+			],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "get-external-process",
@@ -488,7 +553,11 @@
 			"evidence": ["relay-010", "unf2-server-031", "universal-search-040"],
 			"errors": [
 				"Профиль, переход или поле недоступны; версия не совпадает; процесс отсутствует или неактивен."
-			]
+			],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "transition-external-process",
@@ -516,7 +585,11 @@
 			"evidence": ["relay-010", "unf2-server-031", "universal-search-040"],
 			"errors": [
 				"Профиль, переход или поле недоступны; версия не совпадает; процесс отсутствует или неактивен."
-			]
+			],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "update-external-process-fields",
@@ -544,7 +617,11 @@
 			"evidence": ["relay-010", "unf2-server-031", "universal-search-040"],
 			"errors": [
 				"Профиль, переход или поле недоступны; версия не совпадает; процесс отсутствует или неактивен."
-			]
+			],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "cancel-external-process",
@@ -572,7 +649,11 @@
 			"evidence": ["unf2-server-031", "universal-search-040"],
 			"errors": [
 				"Профиль, переход или поле недоступны; версия не совпадает; процесс отсутствует или неактивен."
-			]
+			],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "lease-events",
@@ -596,7 +677,11 @@
 			],
 			"example": "Schedule Trigger → Event → Switch → действие → Acknowledge Event.",
 			"evidence": ["standalone-020", "unf2-server-031", "universal-search-040"],
-			"errors": ["События и подтверждения очереди недоступны в прямом HTTP."]
+			"errors": ["События и подтверждения очереди недоступны в прямом HTTP."],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "acknowledge-event",
@@ -612,7 +697,11 @@
 			"limitations": ["Подтверждать после бизнес-действия, сохранив event_id и lease_token."],
 			"example": "Event → Send Email → Acknowledge Event.",
 			"evidence": ["standalone-020", "unf2-server-031", "universal-search-040"],
-			"errors": ["Устаревшая аренда или событие недоступно."]
+			"errors": ["Устаревшая аренда или событие недоступно."],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "confirm-pdf-delivery",
@@ -628,7 +717,13 @@
 			"limitations": ["Только MSRV. Для standalone доставку контролирует workflow назначения."],
 			"example": "Prepare Document PDF → успешная доставка → Confirm PDF Delivery с file_id, sha256 и event_id.",
 			"evidence": [],
-			"errors": ["Некорректный ID/хэш; файл или событие недоступны; standalone/direct отклоняются."]
+			"errors": [
+				"Некорректный ID/хэш; файл или событие недоступны; standalone/direct отклоняются."
+			],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "retry-event",
@@ -647,7 +742,11 @@
 			],
 			"example": "Ошибка доставки → Retry Event → следующая аренда события.",
 			"evidence": ["standalone-020", "unf2-server-031", "universal-search-040"],
-			"errors": ["Устаревшая аренда или событие недоступно."]
+			"errors": ["Устаревшая аренда или событие недоступно."],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "create-connection",
@@ -668,7 +767,11 @@
 			"evidence": ["unf2-ui-030", "unf2-server-031", "universal-search-040"],
 			"errors": [
 				"Недостаточно прав n8n API; неверное состояние; настройка шлюза завершилась setup_failed."
-			]
+			],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "connection-status",
@@ -690,7 +793,11 @@
 			"evidence": ["unf2-server-031", "universal-search-040"],
 			"errors": [
 				"Недостаточно прав n8n API; неверное состояние; настройка шлюза завершилась setup_failed."
-			]
+			],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "renew-pairing",
@@ -710,7 +817,11 @@
 			"evidence": ["unf2-server-031", "universal-search-040"],
 			"errors": [
 				"Недостаточно прав n8n API; неверное состояние; настройка шлюза завершилась setup_failed."
-			]
+			],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "disconnect-connection",
@@ -728,7 +839,11 @@
 			"evidence": ["unf2-server-031", "universal-search-040"],
 			"errors": [
 				"Недостаточно прав n8n API; неверное состояние; настройка шлюза завершилась setup_failed."
-			]
+			],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "get-queue-result",
@@ -752,7 +867,11 @@
 			],
 			"example": "Wait for Result=false → Wait → Get Result → если pending/leased, повторить только ожидание.",
 			"evidence": ["standalone-020", "unf2-server-031", "universal-search-040"],
-			"errors": ["Результат отсутствует, недоступен или срок хранения истёк."]
+			"errors": ["Результат отсутствует, недоступен или срок хранения истёк."],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "clean-completed-entries",
@@ -772,7 +891,11 @@
 			],
 			"example": "Schedule Trigger → Clean Completed Entries.",
 			"evidence": ["unf2-server-031", "universal-search-040"],
-			"errors": ["Недостаточно прав Data Tables или некорректное подключение."]
+			"errors": ["Недостаточно прав Data Tables или некорректное подключение."],
+			"introducedIn": {
+				"nodeVersion": "0.3.0",
+				"coreVersion": "6.7"
+			}
 		},
 		{
 			"id": "search-documents",
@@ -801,7 +924,11 @@
 			"evidence": ["universal-search-040"],
 			"errors": [
 				"access_denied, invalid_filter, filter_not_allowed, search_too_broad, object_not_found, ambiguous_match, cursor_invalid, search_limit_exceeded"
-			]
+			],
+			"introducedIn": {
+				"nodeVersion": "0.4.0",
+				"coreVersion": "6.8"
+			}
 		},
 		{
 			"id": "search-catalog-items",
@@ -830,7 +957,11 @@
 			"evidence": ["universal-search-040"],
 			"errors": [
 				"access_denied, invalid_filter, filter_not_allowed, search_too_broad, object_not_found, ambiguous_match, cursor_invalid, search_limit_exceeded"
-			]
+			],
+			"introducedIn": {
+				"nodeVersion": "0.4.0",
+				"coreVersion": "6.8"
+			}
 		}
 	]
 }
