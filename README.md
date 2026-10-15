@@ -4,7 +4,7 @@
 
 Connect 1C to n8n using your own queue, a published 1C HTTP service, or an enrolled MSRV service. Read and find documents and catalog items, update permitted fields, retrieve PDFs, and automate approval events and external processes.
 
-**Current release: [npm 0.4.0](https://www.npmjs.com/package/n8n-nodes-ldo-1c-relay/v/0.4.0) · LDO core 6.8 · command contract 1.0.** Version 0.4.0 adds universal document/catalog search by metadata. The separately distributed LDO extension is required; choose a build for your 1C configuration and a compatible core version.
+**Current release: [npm 0.4.0](https://www.npmjs.com/package/n8n-nodes-ldo-1c-relay/v/0.4.0) · LDO core 6.9 · command contract 1.0.** Version 0.4.0 adds universal document/catalog search by metadata. The separately distributed LDO extension is required; choose a build for your 1C configuration and a compatible core version.
 
 [Documentation and operation catalog (Russian)](https://ldo.msrv.tech/docs/n8n/) · [Compatibility](https://ldo.msrv.tech/docs/n8n/compatibility/) · [Release history](https://ldo.msrv.tech/docs/n8n/updates/) · [Get the 1C extension](https://gitsell.ru/msrv-tech/ldo)
 
@@ -61,7 +61,7 @@ Types, fields, print forms, process profiles and transitions come from the conne
 
 ## Compatibility and limits
 
-- **Node 0.4.0 pairs with LDO core 6.8.** Core means the first two components of the extension version. Adaptations for different 1C configurations are distributed separately. See the [supported pairs](https://ldo.msrv.tech/docs/n8n/compatibility/) and [component updates](https://ldo.msrv.tech/docs/n8n/updates/).
+- **Node 0.4.0 pairs with LDO cores 6.8 and 6.9; core 6.9 is recommended.** Core means the first two components of the extension version. Adaptations for different 1C configurations are distributed separately. See the [supported pairs](https://ldo.msrv.tech/docs/n8n/compatibility/) and [component updates](https://ldo.msrv.tech/docs/n8n/updates/).
 - Requires Node.js **22.22.0+**, command contract **1.0**, and a self-hosted n8n compatible with the package. Your own queue also requires n8n Public API/Data Tables and a gateway reachable from the 1C server. MSRV operations require support by the connected service.
 - Event/Delivery polling uses queues. Direct HTTP can receive business events through a separately configured outgoing webhook.
 - Updates require the expected object revision and local write permission. Updating external process fields does not update the source document. Arbitrary BSL, SQL and HTTP execution against 1C are not supported.
@@ -69,6 +69,13 @@ Types, fields, print forms, process profiles and transitions come from the conne
 - Queue timing depends on 1C polling. **Minimum Wait (Seconds)** defaults to 900; lower it only when the polling schedule supports it. Operation timeouts can reach 1800 seconds; configure n8n execution limits accordingly.
 - A timed-out command may still be queued. Retrieve its retained result or retry the **same Command ID and original payload**. A new ID represents a new operation. Delivery is at least once; 1C write receipts prevent the same write being applied again.
 - Standalone PDF results are limited to **7 MiB** and occupy Data Table space. Configure retention for queue data, n8n execution data and files.
+
+## Technical article on Infostart
+
+[![Infostart](https://infostart.ru/bitrix/templates/sandbox_empty/assets/tpl/abo/img/logo.svg)](https://infostart.ru/1c/articles/2818598/)
+
+[Self-hosted queue and direct HTTP: architecture and node capabilities (Russian)](https://infostart.ru/1c/articles/2818598/).
+The article is currently a draft and will become public after publication on Infostart.
 
 ## Development and release
 
